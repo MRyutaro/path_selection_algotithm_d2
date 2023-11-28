@@ -109,18 +109,36 @@ class Network():
         """
         return self.current_networks[s_node][e_node] > 0
 
-    def shortest_path_between(self, s_node: int, e_node: int) -> list:
+    def static_shortest_path_between(self, s_node: int, e_node: int) -> list:
         """
-        ノード間の最短路(ノード数が一番少ない経路)を返す.
+        ノード間の静的な最短路(ノード数が一番少ない経路)を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
         return []
 
-    def widest_path_between(self, s_node: int, e_node: int) -> list:
+    def static_widest_path_between(self, s_node: int, e_node: int) -> list:
         """
-        ノード間の最大路(一番通信容量を大きくできる経路)を返す.
+        ノード間の静的な最大路(一番通信容量を大きくできる経路)を返す.
+
+        s_node: 開始ノード
+        e_node: 終了ノード
+        """
+        return []
+    
+    def dynamic_shortest_path_between(self, s_node: int, e_node: int) -> list:
+        """
+        ノード間の動的な最短路(ノード数が一番少ない経路)を返す.
+
+        s_node: 開始ノード
+        e_node: 終了ノード
+        """
+        return []
+    
+    def dynamic_widest_path_between(self, s_node: int, e_node: int) -> list:
+        """
+        ノード間の動的な最大路(一番通信容量を大きくできる経路)を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード
@@ -188,9 +206,6 @@ class Communication():
     def end(self) -> None:
         """
         通信の終了. 容量を増やす.
-
-        s_node: 開始ノード
-        e_node: 終了ノード
         """
         pass
 
@@ -212,17 +227,15 @@ class CommunicationManager():
         if self.communication_time < 0:
             raise Exception("通信時間は0以上である必要があります。")
         self.communicaton_end_schedule = {}
-        self.out_file = f"data/{self.ALGORITHM}_out.csv"
+        self.out_file = f"data/algorithm_{self.ALGORITHM}_out.csv"
         self.setup()
 
     def setup(self) -> None:
         """
         出力ファイルの作成.
         """
-        # dataフォルダがなければ作成
         if not os.path.isdir("data"):
             os.mkdir("data")
-        # data/{ALGORITHM}_out.csvがなければ作成
         if not os.path.isfile(self.out_file):
             with open(self.out_file, "w") as f:
                 f.write("communication_time, loss\n")
@@ -231,7 +244,6 @@ class CommunicationManager():
         """
         通信を保存する.
         """
-        # data/{ALGORITHM}_out.csvに追記
         with open(self.out_file, "a") as f:
             f.write(f"{self.communication_time}, {self.loss()}\n")
 
@@ -294,5 +306,6 @@ if __name__ == "__main__":
     network = Network()
     network.show()
     network.show_current()
+    # TODO: パラメタnを変化させる
     cm = CommunicationManager(1)
     cm.run()
