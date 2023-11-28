@@ -203,10 +203,11 @@ class CommunicationManager():
         # 3: 最小ホップ経路を用いた要求時経路
         # 4: 最大路を用いた要求時経路
         self.ALGORITHM = 1
-        self.start_num = 0
-        self.end_num = 0
-        self.MAX_START_NUM = 10000
-        self.communication = []
+        self.communication_start_num = 0
+        self.communication_end_num = 0
+        self.try_start_num = 0
+        self.MAX_TRY_START_NUM = 10000
+        self.communications = []
         self.communication_time = communication_time
         if self.communication_time < 0:
             raise Exception("通信時間は0以上である必要があります。")
@@ -238,41 +239,49 @@ class CommunicationManager():
         """
         通信のロス率を返す.
         """
-        return (self.MAX_START_NUM - self.start_num) / self.MAX_START_NUM
+        return (self.MAX_TRY_START_NUM - self.communication_start_num) / self.MAX_TRY_START_NUM
 
     def run(self) -> None:
         """
         通信を実行する.
         """
-        # TODO: while文を回すように変更
-        # TODO: で、MAX_START_NUM回通信を開始する。
-        # TODO: そして通信がすべて終了したらwhile文を抜ける。
-        for i in range(self.MAX_START_NUM):
+        # TODO: 通信の開始間隔も指数分布に従うようにする。
+        i = 0
+        while True:
             print(f"==={i}回目の通信===")
 
-            s_node, e_node = self.network.get_random_nodes()
-            communication = Communication(self.network, s_node, e_node, self.ALGORITHM)
-            if self.communication_time > 0:
-                communication.set_communication_time_by_int(self.communication_time)
+            # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
+            if self.try_start_num <= self.MAX_TRY_START_NUM:
+                self.try_start_num += 1
+                s_node, e_node = self.network.get_random_nodes()
+                communication = Communication(self.network, s_node, e_node, self.ALGORITHM)
 
-            # 通信の開始
-            if communication.start():
-                self.start_num += 1
-                self.communication.append(communication)
-                communication_time = communication.get_communication_time()
-                if i+communication_time in self.communicaton_end_schedule:
-                    self.communicaton_end_schedule[i+communication_time].append(communication)
+                if self.communication_time > 0:
+                    communication.set_communication_time_by_int(self.communication_time)
+
+                # 通信の開始
+                if communication.start():
+                    self.communication_start_num += 1
+                    self.communications.append(communication)
+                    communication_time = communication.get_communication_time()
+                    if i+communication_time in self.communicaton_end_schedule:
+                        self.communicaton_end_schedule[i+communication_time].append(communication)
+                    else:
+                        self.communicaton_end_schedule[i+communication_time] = [communication]
                 else:
-                    self.communicaton_end_schedule[i+communication_time] = [communication]
-            else:
-               self.communication.append(None)
+                    self.communications.append(None)
 
             # 通信の終了
             if i in self.communicaton_end_schedule:
                 for communication in self.communicaton_end_schedule[i]:
                     communication.end()
-                    self.end_num += 1
+                    self.communication_end_num += 1
                 self.communicaton_end_schedule.pop(i)
+
+            # 終了
+            if len(self.communicaton_end_schedule) == 0:
+                print("通信がすべて終了しました。")
+                break
 
         # networkとcurrent_networkが一致していなければエラー
         if self.network.get() != self.network.get_current():
@@ -285,5 +294,5 @@ if __name__ == "__main__":
     network = Network()
     network.show()
     network.show_current()
-    cm = CommunicationManager()
+    cm = CommunicationManager(1)
     cm.run()
