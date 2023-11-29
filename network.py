@@ -93,36 +93,44 @@ class Network():
         """
         return self.current_networks[s_node][e_node]
 
-    def is_capacity(self, s_node: int, e_node: int) -> bool:
-        """
-        ノード間に容量があるか確認する.
-
-        s_node: 開始ノード
-        e_node: 終了ノード
-        """
-        return self.networks[s_node][e_node] > 0
-
-    def is_current_capacity(self, s_node: int, e_node: int) -> bool:
+    def is_capacity(self, s_node: int, e_node: int, networks: list = None) -> bool:
         """
         現在、ノード間に容量があるか確認する.
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        return self.current_networks[s_node][e_node] > 0
+        if networks is None:
+            networks = self.current_networks
 
-    # s_nodeからe_nodeへの経路があるか確認する
-    def is_path(self, s_node: int, e_node: int, networks: list = None) -> bool:
+        return networks[s_node][e_node] > 0
+
+    def get_path(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
         """
-        ノード間に経路があるか確認する.
+        s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        # s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかればTrueを返す
-        return False
+        if len(path) == 0:
+            path.append(s_node)
 
-    def shortest_path_between(self, networks: list, s_node: int, e_node: int) -> list:
+        # 終了ノードに到達した場合は経路を返す
+        if s_node == e_node:
+            return path
+
+        # s_nodeとつながっているノードを探索
+        for node in range(len(networks[s_node])):
+            if (node not in path) and (networks[s_node][node] > 0):
+                # 再帰的に探索
+                result = self.get_path(node, e_node, networks, path + [node])
+                if result:
+                    return result
+
+        # 経路が見つからない場合は空リストを返す
+        return []
+
+    def shortest_path_between(self, s_node: int, e_node: int, networks: list) -> list:
         """
         ノード間の最短路(ノード数が一番少ない経路)を返す.
 
@@ -131,50 +139,41 @@ class Network():
         """
         return []
 
-    def widest_path_between(self, s_node: int, e_node: int, networks: list = None) -> list:
+    def widest_path_between(self, s_node: int, e_node: int, networks: list, more_than_max_networks: list = None) -> list:
         """
         ノード間の最大路(一番通信容量を大きくできる経路)を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        print(f"start: {s_node}, end: {e_node}")
-        if networks is None:
+        if more_than_max_networks is None:
             # 0で初期化
-            networks = [[0 for _ in range(len(self.networks))]
-                        for _ in range(len(self.networks))]
-        
-        for i in range(len(networks)):
-            print(networks[i])
+            more_than_max_networks = [[0 for _ in range(len(self.networks))]
+                                      for _ in range(len(self.networks))]
 
         # リンクを重みの大きい順にソート
         links = []
-        for i in range(len(self.networks)):
-            for j in range(len(self.networks[i])):
-                if self.is_capacity(i, j) and i < j:
-                    heapq.heappush(links, (-self.networks[i][j], i, j))
-
-        print(links)
+        for i in range(len(networks)):
+            for j in range(len(networks[i])):
+                if self.is_capacity(i, j, network) and i < j:
+                    heapq.heappush(links, (-networks[i][j], i, j))
 
         # リンクを大きい順に取り出し、経路を作成
         while links:
             # リンクを取り出す
             link = heapq.heappop(links)
-            print(link)
+            print(f"s_node: {link[1]}, e_node: {link[2]}, capacity: {-link[0]}")
 
             # 経路にリンクを追加
-            networks[link[1]][link[2]] = 1
+            networks[link[1]][link[2]] = -link[0]
 
-            # 経路があるか確認
-            if self.is_path(s_node, e_node, networks):
+            path = self.get_path(s_node, e_node, networks)
+            if path:
                 # 経路があれば、経路を返す
-                return networks
+                return path
 
-            # 経路がなければ、リンクを削除
-            networks[link[1]][link[2]] = 0
-
-        # 経路がなければ、Noneを返す
-        raise None
+        # 経路がなければ、空リストを返す
+        return []
 
 
 if __name__ == "__main__":
@@ -183,9 +182,14 @@ if __name__ == "__main__":
 
     # 開始ノードと終了ノードを取得
     start_node, end_node = network.get_random_nodes()
+    print(f"start_node: {start_node}, end_node: {end_node}")
 
-    # 最大路を求める
-    widest_path = network.widest_path_between(start_node, end_node)
+    # start_nodeとend_nodeの間のpathを求める
+    path = network.get_path(start_node, end_node, network.get())
+    print(f"path: {path}")
 
-    # 結果を表示
-    print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
+    # # 最大路を求める
+    # widest_path = network.widest_path_between(start_node, end_node)
+
+    # # 結果を表示
+    # print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
