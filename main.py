@@ -61,7 +61,7 @@ class Network():
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        pass
+        self.current_networks[s_node][e_node] -= 1
 
     def end(self, s_node: int, e_node: int) -> None:
         """
@@ -71,7 +71,9 @@ class Network():
         e_node: 終了ノード
         """
         # TODO: current_networksの容量がnetworksの容量を超えていないか確認
-        pass
+        self.current_networks[s_node][e_node] += 1
+        if self.current_networks[s_node][e_node] > self.networks[s_node][e_node]:
+            raise Exception("current_networksの容量がnetworksの容量を超えています。")
 
     def capacity_between(self, s_node: int, e_node: int) -> int:
         """
@@ -153,7 +155,7 @@ class Communication():
         # 2: 最大路を用いた固定経路
         # 3: 最小ホップ経路を用いた要求時経路
         # 4: 最大路を用いた要求時経路
-        self.path = self.set_path(s_node, e_node, algorithm)
+        self.path = self.get_path(s_node, e_node, algorithm)
         # 指数分布に従う通信時間
         self.communication_time = 0
         self.set_communication_time_by_expovariate()
@@ -180,7 +182,7 @@ class Communication():
         """
         return self.communication_time
 
-    def set_path(self, s_node: int, e_node: int, algorithm: int) -> list:
+    def get_path(self, s_node: int, e_node: int, algorithm: int) -> list:
         """
         経路の決定.
 
@@ -192,7 +194,16 @@ class Communication():
         3 => 最小ホップ経路を用いた要求時経路
         4 => 最大路を用いた要求時経路
         """
-        return []
+        if algorithm == 1:
+            return self.network.static_shortest_path_between(s_node, e_node)
+        elif algorithm == 2:
+            return self.network.static_widest_path_between(s_node, e_node)
+        elif algorithm == 3:
+            return self.network.dynamic_shortest_path_between(s_node, e_node)
+        elif algorithm == 4:
+            return self.network.dynamic_widest_path_between(s_node, e_node)
+        else:
+            raise Exception("algorithmの値が不正です。")
 
     def start(self) -> bool:
         """
@@ -201,28 +212,42 @@ class Communication():
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        return False
+        # self.pathが空ならエラー
+        if len(self.path) == 0:
+            raise Exception("pathが空です。")
+
+        # self.pathの容量があるか確認
+        for link in range(len(self.path) - 1):
+            if not self.network.is_capacity(self.path[link], self.path[link + 1]):
+                # 1つでも容量がなければ通信は失敗
+                return False
+
+        # self.pathの容量を減らす
+        for link in range(len(self.path) - 1):
+            self.network.start(self.path[link], self.path[link + 1])
+
+        return True
 
     def end(self) -> None:
         """
         通信の終了. 容量を増やす.
         """
-        pass
+        for link in range(len(self.path) - 1):
+            self.network.end(self.path[link], self.path[link + 1])
 
 
 class CommunicationManager():
-    def __init__(self, communication_time: int = 0) -> None:
+    def __init__(self, algorithm: int = 1, communication_time: int = 0) -> None:
         self.network = Network()
         # 1: 最小ホップ経路を用いた固定経路
         # 2: 最大路を用いた固定経路
         # 3: 最小ホップ経路を用いた要求時経路
         # 4: 最大路を用いた要求時経路
-        self.ALGORITHM = 1
+        self.ALGORITHM = algorithm
         self.communication_start_num = 0
         self.communication_end_num = 0
         self.try_start_num = 0
         self.MAX_TRY_START_NUM = 10000
-        self.communications = []
         self.communication_time = communication_time
         if self.communication_time < 0:
             raise Exception("通信時間は0以上である必要があります。")
@@ -258,9 +283,9 @@ class CommunicationManager():
         通信を実行する.
         """
         # TODO: 通信の開始間隔も指数分布に従うようにする。
-        i = 0
+        time = 0
         while True:
-            print(f"==={i}回目の通信===")
+            print(f"==={time}回目の通信===")
 
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num <= self.MAX_TRY_START_NUM:
@@ -274,21 +299,18 @@ class CommunicationManager():
                 # 通信の開始
                 if communication.start():
                     self.communication_start_num += 1
-                    self.communications.append(communication)
                     communication_time = communication.get_communication_time()
-                    if i+communication_time in self.communicaton_end_schedule:
-                        self.communicaton_end_schedule[i+communication_time].append(communication)
+                    if time + communication_time in self.communicaton_end_schedule:
+                        self.communicaton_end_schedule[time + communication_time].append(communication)
                     else:
-                        self.communicaton_end_schedule[i+communication_time] = [communication]
-                else:
-                    self.communications.append(None)
+                        self.communicaton_end_schedule[time + communication_time] = [communication]
 
             # 通信の終了
-            if i in self.communicaton_end_schedule:
-                for communication in self.communicaton_end_schedule[i]:
+            if time in self.communicaton_end_schedule:
+                for communication in self.communicaton_end_schedule[time]:
                     communication.end()
                     self.communication_end_num += 1
-                self.communicaton_end_schedule.pop(i)
+                self.communicaton_end_schedule.pop(time)
 
             # 終了
             if len(self.communicaton_end_schedule) == 0:
@@ -306,6 +328,6 @@ if __name__ == "__main__":
     network = Network()
     network.show()
     network.show_current()
-    # TODO: パラメタnを変化させる
-    cm = CommunicationManager(1)
+    # TODO: アルゴリズムとパラメタnを変化させる
+    cm = CommunicationManager(algorithm=1, communication_time=1)
     cm.run()
