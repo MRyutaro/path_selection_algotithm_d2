@@ -60,7 +60,7 @@ class CommunicationManager():
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num <= self.MAX_TRY_START_NUM:
                 self.try_start_num += 1
-                s_node, e_node = self.network.get_random_nodes()
+                s_node, e_node = self.network.random_two_nodes()
                 communication = Communication(self.network, s_node, e_node, self.ALGORITHM)
 
                 if self.communication_time > 0:

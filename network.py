@@ -44,7 +44,7 @@ class Network():
         for i in range(len(self.current_networks)):
             print(self.current_networks[i])
 
-    def get_random_nodes(self) -> tuple[int, int]:
+    def random_two_nodes(self) -> tuple[int, int]:
         """
         ランダムなノードを2つ返す.
         """
@@ -52,46 +52,62 @@ class Network():
         nodes = list(range(node_num))
         s_node, e_node = random.sample(nodes, 2)
         return s_node, e_node
+    
+    def adjacent_nodes(self, node: int, networks: list = None) -> list:
+        """
+        ノードに隣接するノードを取得する.
 
-    def start(self, s_node: int, e_node: int) -> None:
+        node: ノード
+        """
+        if networks is None:
+            networks = self.current_networks
+
+        return [i for i, x in enumerate(networks[node]) if x > 0]
+
+    def start(self, path: list) -> bool:
         """
         ネットワークの開始. 容量を減らす.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
+        path: 経路
         """
-        self.current_networks[s_node][e_node] -= 1
-        self.current_networks[e_node][s_node] -= 1
+        # パスが空、すなわち経路がない場合は通信は失敗
+        if len(path) == 0:
+            return False
 
-    def end(self, s_node: int, e_node: int) -> None:
+        # 容量を1減らす
+        for i in range(len(path)-1):
+            # current_networks[node][node+1]が0以下の場合は通信は失敗
+            if self.current_networks[path[i]][path[i+1]] <= 0:
+                return False
+            self.current_networks[path[i]][path[i+1]] -= 1
+            self.current_networks[path[i+1]][path[i]] -= 1
+
+        return True
+
+    def end(self, path: list) -> None:
         """
         ネットワークの終了. 容量を増やす.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
+        path: 経路
         """
-        self.current_networks[s_node][e_node] += 1
-        self.current_networks[e_node][s_node] += 1
-        if self.current_networks[s_node][e_node] > self.networks[s_node][e_node]:
-            raise Exception("current_networksの容量がnetworksの容量を超えています。")
+        # パスの容量を1増やす
+        for i in range(len(path)-1):
+            self.current_networks[path[i]][path[i+1]] += 1
+            self.current_networks
+            if self.current_networks[path[i+1]][path[i]] > self.networks[path[i+1]][path[i]]:
+                raise Exception("current_networksの容量がnetworksの容量を超えています。") 
 
-    def capacity_between(self, s_node: int, e_node: int) -> int:
-        """
-        ノード間の容量を返す.
-
-        s_node: 開始ノード
-        e_node: 終了ノード
-        """
-        return self.networks[s_node][e_node]
-
-    def current_capacity_between(self, s_node: int, e_node: int) -> int:
+    def capacity_between(self, s_node: int, e_node: int, networks: list = None) -> int:
         """
         ノード間の現在の容量を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        return self.current_networks[s_node][e_node]
+        if networks is None:
+            networks = self.current_networks
+
+        return networks[s_node][e_node]
 
     def is_capacity(self, s_node: int, e_node: int, networks: list = None) -> bool:
         """
@@ -103,9 +119,9 @@ class Network():
         if networks is None:
             networks = self.current_networks
 
-        return networks[s_node][e_node] > 0
+        return self.capacity_between(s_node, e_node, networks) > 0
 
-    def get_path(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
+    def path_between(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
         """
         s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す. 最短かどうかは保障しない.
 
@@ -123,7 +139,7 @@ class Network():
         for node in range(len(networks[s_node])):
             if (node not in path) and (networks[s_node][node] > 0):
                 # 再帰的に探索
-                result = self.get_path(node, e_node, networks, path + [node])
+                result = self.path_between(node, e_node, networks, path + [node])
                 if result:
                     return result
 
@@ -168,7 +184,7 @@ class Network():
             more_than_max_networks[link[1]][link[2]] = -link[0]
             more_than_max_networks[link[2]][link[1]] = -link[0]
 
-            path = self.get_path(s_node, e_node, more_than_max_networks)
+            path = self.path_between(s_node, e_node, more_than_max_networks)
             if path:
                 # 経路があれば、経路を返す
                 return path
@@ -182,7 +198,7 @@ if __name__ == "__main__":
     network = Network()
 
     # 開始ノードと終了ノードを取得
-    start_node, end_node = network.get_random_nodes()
+    start_node, end_node = network.random_two_nodes()
 
     # 最大路を求める
     widest_path = network.widest_path_between(start_node, end_node, network.get())

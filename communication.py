@@ -19,6 +19,7 @@ class Communication():
         self.path = self.get_path(s_node, e_node, algorithm)
         self.communication_time = 0
         self.set_communication_time_by_expovariate()
+        self.is_communicating = False
 
     def set_communication_time_by_expovariate(self, average: int = 10) -> None:
         """
@@ -72,33 +73,30 @@ class Communication():
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        # self.pathが空なら経路がないので通信は失敗
-        if len(self.path) == 0:
+        if self.is_communicating:
+            raise Exception("通信中です。")
+
+        if self.network.start(self.path):
+            self.is_communicating = True
+            return True
+        else:
             return False
-
-        # self.pathの容量があるか確認
-        for link in range(len(self.path) - 1):
-            if not self.network.is_capacity(self.path[link], self.path[link + 1]):
-                # 1つでも容量がなければ通信は失敗
-                return False
-
-        # self.pathの容量を減らす
-        for link in range(len(self.path) - 1):
-            self.network.start(self.path[link], self.path[link + 1])
-
-        return True
 
     def end(self) -> None:
         """
         通信の終了. 容量を増やす.
         """
-        for link in range(len(self.path) - 1):
-            self.network.end(self.path[link], self.path[link + 1])
+        if not self.is_communicating:
+            raise Exception("通信が開始されていません。")
+
+        self.is_communicating = False
+        self.network.end(self.path)
 
 
 if __name__ == "__main__":
     network = Network()
-    communication = Communication(network, 0, 9, 2)
+    s_node, e_node = network.random_two_nodes()
+    communication = Communication(network, s_node, e_node, 2)
     print(communication.path)
     network.show_current()
     communication.start()
