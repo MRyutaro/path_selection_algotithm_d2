@@ -54,11 +54,15 @@ class CommunicationManager():
         """
         通信を実行する.
         """
+        self.network.show()
+        self.network.show_current()
+
         # TODO: 通信の開始間隔も指数分布に従うようにする。
         time = 0
         while True:
+            print(f"time: {time}, is_capable: {self.network.is_capable()}, start: {self.communication_start_num}, end: {self.communication_end_num}")
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
-            if self.try_start_num <= self.MAX_TRY_START_NUM:
+            if self.try_start_num < self.MAX_TRY_START_NUM:
                 self.try_start_num += 1
                 s_node, e_node = self.network.random_two_nodes()
                 communication = Communication(self.network, s_node, e_node, self.ALGORITHM)
@@ -83,12 +87,11 @@ class CommunicationManager():
             # 通信の終了
             if time in self.communicaton_end_schedule:
                 for communication in self.communicaton_end_schedule[time]:
-                    communication.end()
                     self.communication_end_num += 1
+                    communication.end()
                 self.communicaton_end_schedule.pop(time)
 
             time += 1
-
 
         # networkとcurrent_networkが一致していなければエラー
         if self.network.get() != self.network.get_current():

@@ -1,5 +1,6 @@
 import heapq
 import random
+from collections import deque
 
 class Network():
     def __init__(self) -> None:
@@ -74,13 +75,17 @@ class Network():
         if len(path) == 0:
             return False
 
+        # path上のすべてのリンクの容量が1以上あるか確認したあと、容量を1減らす
+        for i in range(len(path)-1):
+            if self.current_networks[path[i]][path[i+1]] < 1:
+                return False
+
         # 容量を1減らす
         for i in range(len(path)-1):
-            # current_networks[node][node+1]が0以下の場合は通信は失敗
-            if self.current_networks[path[i]][path[i+1]] <= 0:
-                return False
             self.current_networks[path[i]][path[i+1]] -= 1
             self.current_networks[path[i+1]][path[i]] -= 1
+            if self.current_networks[path[i]][path[i+1]] < 0:
+                raise Exception("current_networksの容量が0以下です。")
 
         return True
 
@@ -93,9 +98,9 @@ class Network():
         # パスの容量を1増やす
         for i in range(len(path)-1):
             self.current_networks[path[i]][path[i+1]] += 1
-            self.current_networks
+            self.current_networks[path[i+1]][path[i]] += 1
             if self.current_networks[path[i+1]][path[i]] > self.networks[path[i+1]][path[i]]:
-                raise Exception("current_networksの容量がnetworksの容量を超えています。") 
+                raise Exception("current_networksの容量がnetworksの容量を超えています。")
 
     def capacity_between(self, s_node: int, e_node: int, networks: list = None) -> int:
         """
@@ -109,7 +114,21 @@ class Network():
 
         return networks[s_node][e_node]
 
-    def is_capacity(self, s_node: int, e_node: int, networks: list = None) -> bool:
+    def is_capable(self, networks: list = None) -> bool:
+        """
+        ネットワークの容量があるか確認する.
+        """
+        if networks is None:
+            networks = self.current_networks
+
+        for i in range(len(networks)):
+            for j in range(len(networks[i])):
+                if i < j:
+                    if self.is_capable_between(i, j, networks):
+                        return True
+        return False
+
+    def is_capable_between(self, s_node: int, e_node: int, networks: list = None) -> bool:
         """
         ノード間に容量があるか確認する.
 
@@ -121,7 +140,7 @@ class Network():
 
         return self.capacity_between(s_node, e_node, networks) > 0
 
-    def path_between(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
+    def _path_between(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
         """
         s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す. 最短かどうかは保障しない.
 
@@ -136,10 +155,11 @@ class Network():
             return path
 
         # s_nodeとつながっているノードを探索
+        # TODO: adjacent_nodesを使えないか
         for node in range(len(networks[s_node])):
             if (node not in path) and (networks[s_node][node] > 0):
                 # 再帰的に探索
-                result = self.path_between(node, e_node, networks, path + [node])
+                result = self._path_between(node, e_node, networks, path + [node])
                 if result:
                     return result
 
@@ -153,6 +173,26 @@ class Network():
         s_node: 開始ノード
         e_node: 終了ノード
         """
+        # 空き容量がなければ、空リストを返す
+        if not self.is_capable(networks):
+            return []
+
+        # キューの初期化
+        queue = deque([(s_node, [s_node])])
+
+        while queue:
+            current_node, path = queue.popleft()
+
+            # 終了ノードに到達したら経路を返す
+            if current_node == e_node:
+                return path
+
+            # 隣接ノードを探索
+            for neighbor in self.adjacent_nodes(current_node, networks):
+                if neighbor not in path:
+                    queue.append((neighbor, path + [neighbor]))
+
+        # 終了ノードに到達できなかった場合は空のリストを返す
         return []
 
     def widest_path_between(self, s_node: int, e_node: int, networks: list) -> list:
@@ -163,6 +203,10 @@ class Network():
         e_node: 終了ノード
         networks: ネットワーク
         """
+        # 空き容量がなければ、空リストを返す
+        if not self.is_capable(networks):
+            return []
+
         # G'を初期化
         more_than_max_networks = [[0 for _ in range(len(self.networks))]
                                     for _ in range(len(self.networks))]
@@ -172,7 +216,7 @@ class Network():
         for i in range(len(networks)):
             for j in range(len(networks[i])):
                 if i < j:
-                    if self.is_capacity(i, j, networks):
+                    if self.is_capable_between(i, j, networks):
                         heapq.heappush(links, (-networks[i][j], i, j))
 
         # リンクを大きい順に取り出し、経路を作成
@@ -184,7 +228,7 @@ class Network():
             more_than_max_networks[link[1]][link[2]] = -link[0]
             more_than_max_networks[link[2]][link[1]] = -link[0]
 
-            path = self.path_between(s_node, e_node, more_than_max_networks)
+            path = self._path_between(s_node, e_node, more_than_max_networks)
             if path:
                 # 経路があれば、経路を返す
                 return path
@@ -202,6 +246,10 @@ if __name__ == "__main__":
 
     # 最大路を求める
     widest_path = network.widest_path_between(start_node, end_node, network.get())
-
     # 結果を表示
     print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
+
+    # 最短路を求める
+    shortest_path = network.shortest_path_between(start_node, end_node, network.get())
+    # 結果を表示
+    print(f"Shortest Path from Node {start_node} to Node {end_node}: {shortest_path}")

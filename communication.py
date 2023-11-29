@@ -16,6 +16,7 @@ class Communication():
         4 => 最大路を用いた要求時経路
         """
         self.network = network
+        # TODO: communication_timeを主導で決定したときに、通信時間を変更する
         self.path = self.get_path(s_node, e_node, algorithm)
         self.communication_time = 0
         self.set_communication_time_by_expovariate()
@@ -23,7 +24,7 @@ class Communication():
 
     def set_communication_time_by_expovariate(self, average: int = 10) -> None:
         """
-        指数分布に従う通信時間を返す.
+        指数分布に従う通信時間を設定する.
 
         average: 平均
         """
@@ -96,7 +97,7 @@ class Communication():
 if __name__ == "__main__":
     network = Network()
     s_node, e_node = network.random_two_nodes()
-    communication = Communication(network, s_node, e_node, 2)
+    communication = Communication(network, s_node, e_node, 3)
     print(communication.path)
     network.show_current()
     communication.start()
