@@ -50,13 +50,13 @@ class Communication():
         4 => 最大路を用いた要求時経路
         """
         if algorithm == 1:
-            return self.network.shortest_path_between(self.network.get(), s_node, e_node)
+            return self.network.shortest_path_between(s_node, e_node, self.network.get())
         elif algorithm == 2:
-            return self.network.widest_path_between(self.network.get(), s_node, e_node)
+            return self.network.widest_path_between(s_node, e_node, self.network.get())
         elif algorithm == 3:
-            return self.network.shortest_path_between(self.network.get_current(), s_node, e_node)
+            return self.network.shortest_path_between(s_node, e_node, self.network.get_current())
         elif algorithm == 4:
-            return self.network.widest_path_between(self.network.get_current(), s_node, e_node)
+            return self.network.widest_path_between(s_node, e_node, self.network.get_current())
         else:
             raise Exception("algorithmの値が不正です。")
 
@@ -68,7 +68,7 @@ class Communication():
         e_node: 終了ノード
         """
         # self.pathが空なら経路がないので通信は失敗
-        if self.path is None:
+        if len(self.path) == 0:
             return False
 
         # self.pathの容量があるか確認

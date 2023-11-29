@@ -1,7 +1,6 @@
 import heapq
 import random
 
-
 class Network():
     def __init__(self) -> None:
         self.networks = [
@@ -70,7 +69,6 @@ class Network():
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        # TODO: current_networksの容量がnetworksの容量を超えていないか確認
         self.current_networks[s_node][e_node] += 1
         if self.current_networks[s_node][e_node] > self.networks[s_node][e_node]:
             raise Exception("current_networksの容量がnetworksの容量を超えています。")
@@ -95,7 +93,7 @@ class Network():
 
     def is_capacity(self, s_node: int, e_node: int, networks: list = None) -> bool:
         """
-        現在、ノード間に容量があるか確認する.
+        ノード間に容量があるか確認する.
 
         s_node: 開始ノード
         e_node: 終了ノード
@@ -107,7 +105,7 @@ class Network():
 
     def get_path(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
         """
-        s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す
+        s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す. 最短かどうかは保障しない.
 
         s_node: 開始ノード
         e_node: 終了ノード
@@ -139,35 +137,36 @@ class Network():
         """
         return []
 
-    def widest_path_between(self, s_node: int, e_node: int, networks: list, more_than_max_networks: list = None) -> list:
+    def widest_path_between(self, s_node: int, e_node: int, networks: list) -> list:
         """
         ノード間の最大路(一番通信容量を大きくできる経路)を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード
+        networks: ネットワーク
         """
-        if more_than_max_networks is None:
-            # 0で初期化
-            more_than_max_networks = [[0 for _ in range(len(self.networks))]
-                                      for _ in range(len(self.networks))]
+        # G'を初期化
+        more_than_max_networks = [[0 for _ in range(len(self.networks))]
+                                    for _ in range(len(self.networks))]
 
         # リンクを重みの大きい順にソート
         links = []
         for i in range(len(networks)):
             for j in range(len(networks[i])):
-                if self.is_capacity(i, j, network) and i < j:
-                    heapq.heappush(links, (-networks[i][j], i, j))
+                if i < j:
+                    if self.is_capacity(i, j, networks):
+                        heapq.heappush(links, (-networks[i][j], i, j))
 
         # リンクを大きい順に取り出し、経路を作成
         while links:
             # リンクを取り出す
             link = heapq.heappop(links)
-            print(f"s_node: {link[1]}, e_node: {link[2]}, capacity: {-link[0]}")
 
             # 経路にリンクを追加
-            networks[link[1]][link[2]] = -link[0]
+            more_than_max_networks[link[1]][link[2]] = -link[0]
+            more_than_max_networks[link[2]][link[1]] = -link[0]
 
-            path = self.get_path(s_node, e_node, networks)
+            path = self.get_path(s_node, e_node, more_than_max_networks)
             if path:
                 # 経路があれば、経路を返す
                 return path
@@ -182,14 +181,9 @@ if __name__ == "__main__":
 
     # 開始ノードと終了ノードを取得
     start_node, end_node = network.get_random_nodes()
-    print(f"start_node: {start_node}, end_node: {end_node}")
 
-    # start_nodeとend_nodeの間のpathを求める
-    path = network.get_path(start_node, end_node, network.get())
-    print(f"path: {path}")
+    # 最大路を求める
+    widest_path = network.widest_path_between(start_node, end_node, network.get())
 
-    # # 最大路を求める
-    # widest_path = network.widest_path_between(start_node, end_node)
-
-    # # 結果を表示
-    # print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
+    # 結果を表示
+    print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
