@@ -5,13 +5,18 @@ from network import Network
 
 class Communication():
     def __init__(self, network: Network, s_node: int, e_node: int, algorithm: int) -> None:
+        """
+        network: ネットワーク
+        s_node: 開始ノード
+        e_node: 終了ノード
+        algorithm: 経路の決定方法
+        1 => 最小ホップ経路を用いた固定経路
+        2 => 最大路を用いた固定経路
+        3 => 最小ホップ経路を用いた要求時経路
+        4 => 最大路を用いた要求時経路
+        """
         self.network = network
-        # 1: 最小ホップ経路を用いた固定経路
-        # 2: 最大路を用いた固定経路
-        # 3: 最小ホップ経路を用いた要求時経路
-        # 4: 最大路を用いた要求時経路
         self.path = self.get_path(s_node, e_node, algorithm)
-        # 指数分布に従う通信時間
         self.communication_time = 0
         self.set_communication_time_by_expovariate()
 

@@ -6,11 +6,15 @@ from communication import Communication
 
 class CommunicationManager():
     def __init__(self, algorithm: int = 1, communication_time: int = 0) -> None:
+        """
+        algorithm: 通信のアルゴリズム
+        1 => 最小ホップ経路を用いた固定経路
+        2 => 最大路を用いた固定経路
+        3 => 最小ホップ経路を用いた要求時経路
+        4 => 最大路を用いた要求時経路
+        communication_time: 通信時間
+        """
         self.network = Network()
-        # 1: 最小ホップ経路を用いた固定経路
-        # 2: 最大路を用いた固定経路
-        # 3: 最小ホップ経路を用いた要求時経路
-        # 4: 最大路を用いた要求時経路
         self.ALGORITHM = algorithm
         self.communication_start_num = 0
         self.communication_end_num = 0
@@ -53,8 +57,6 @@ class CommunicationManager():
         # TODO: 通信の開始間隔も指数分布に従うようにする。
         time = 0
         while True:
-            print(f"==={time}回目の通信===")
-
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num <= self.MAX_TRY_START_NUM:
                 self.try_start_num += 1
@@ -72,6 +74,11 @@ class CommunicationManager():
                         self.communicaton_end_schedule[time + communication_time].append(communication)
                     else:
                         self.communicaton_end_schedule[time + communication_time] = [communication]
+            else:
+                # 終了
+                if len(self.communicaton_end_schedule) == 0:
+                    print("通信がすべて終了しました。")
+                    break
 
             # 通信の終了
             if time in self.communicaton_end_schedule:
@@ -80,10 +87,8 @@ class CommunicationManager():
                     self.communication_end_num += 1
                 self.communicaton_end_schedule.pop(time)
 
-            # 終了
-            if len(self.communicaton_end_schedule) == 0:
-                print("通信がすべて終了しました。")
-                break
+            time += 1
+
 
         # networkとcurrent_networkが一致していなければエラー
         if self.network.get() != self.network.get_current():
