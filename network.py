@@ -61,6 +61,7 @@ class Network():
         e_node: 終了ノード
         """
         self.current_networks[s_node][e_node] -= 1
+        self.current_networks[e_node][s_node] -= 1
 
     def end(self, s_node: int, e_node: int) -> None:
         """
@@ -70,6 +71,7 @@ class Network():
         e_node: 終了ノード
         """
         self.current_networks[s_node][e_node] += 1
+        self.current_networks[e_node][s_node] += 1
         if self.current_networks[s_node][e_node] > self.networks[s_node][e_node]:
             raise Exception("current_networksの容量がnetworksの容量を超えています。")
 

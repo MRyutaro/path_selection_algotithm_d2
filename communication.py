@@ -89,3 +89,14 @@ class Communication():
         """
         for link in range(len(self.path) - 1):
             self.network.end(self.path[link], self.path[link + 1])
+
+
+if __name__ == "__main__":
+    network = Network()
+    communication = Communication(network, 0, 9, 2)
+    print(communication.path)
+    network.show_current()
+    communication.start()
+    network.show_current()
+    communication.end()
+    network.show_current()
