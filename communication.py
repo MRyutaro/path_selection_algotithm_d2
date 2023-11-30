@@ -4,7 +4,7 @@ from network import Network
 
 
 class Communication():
-    def __init__(self, network: Network, s_node: int, e_node: int, algorithm: int) -> None:
+    def __init__(self, network: Network, s_node: int, e_node: int, algorithm: int, service_time: int = 1, arrival_interval: int = 1) -> None:
         """
         network: ネットワーク
         s_node: 開始ノード
@@ -17,48 +17,30 @@ class Communication():
         """
         self.network = network
         self.path = self.get_path(s_node, e_node, algorithm)
-        self.service_time = 0
-        self.arrival_interval = 0
-        # TODO: ここはなくす。
-        self.set_service_time_by_expovariate()
-        self.set_arrival_interval_by_expovariate()
+        self.service_time = service_time
+        self.arrival_interval = arrival_interval
         self.is_communicating = False
 
     # 指数分布を返すプライベートメソッド
     def __expovariate(self, average: int) -> int:
+        # TODO: 0を返さないようにする。
         return round(random.expovariate(1 / average))
 
-    def set_service_time_by_expovariate(self, average: int = 10) -> None:
+    def set_service_time_by_expovariate(self, average_service_time: int = 1) -> None:
         """
         指数分布に従う通信時間を設定する.
 
         average: 平均
         """
-        self.service_time = self.__expovariate(average)
+        self.service_time = self.__expovariate(average_service_time)
 
-    def set_arrival_interval_by_expovariate(self, average: int = 10) -> None:
+    def set_arrival_interval_by_expovariate(self, average_arrival_interval: int = 1) -> None:
         """
         指数分布に従う通信の到着間隔を設定する.
 
         average: 平均
         """
-        self.arrival_interval = self.__expovariate(average)
-
-    def set_service_time_by_int(self, service_time: int) -> None:
-        """
-        通信時間を設定する.
-
-        service_time: 通信時間
-        """
-        self.service_time = service_time
-
-    def set_arrival_interval_by_int(self, arrival_interval: int) -> None:
-        """
-        通信の到着間隔を設定する.
-
-        arrival_interval: 通信の到着間隔
-        """
-        self.arrival_interval = arrival_interval
+        self.arrival_interval = self.__expovariate(average_arrival_interval)
 
     def get_service_time(self) -> int:
         """

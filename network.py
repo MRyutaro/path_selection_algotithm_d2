@@ -232,7 +232,7 @@ class Network():
             more_than_max_networks[link[1]][link[2]] = -link[0]
             more_than_max_networks[link[2]][link[1]] = -link[0]
 
-            path = self._path_between(s_node, e_node, more_than_max_networks)
+            path = self.__path_between(s_node, e_node, more_than_max_networks)
             if path:
                 # 経路があれば、経路を返す
                 return path

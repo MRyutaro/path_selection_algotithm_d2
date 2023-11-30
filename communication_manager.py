@@ -22,12 +22,16 @@ class CommunicationManager():
         self.try_start_num = 0
         self.MAX_TRY_START_NUM = 10000
 
+        # サービス時間と到着間隔は固定値
         self.service_time = service_time
         self.arrival_interval = arrival_interval
         if self.service_time < 0:
             raise Exception("通信時間は0以上である必要があります。")
         if self.arrival_interval < 0:
             raise Exception("通信の到着間隔は0以上である必要があります。")
+        # サービス時間と到着間隔は指数分布に従う. 0で初期化
+        self.avarage_service_time = 0
+        self.avarage_arrival_interval = 0
 
         self.communication_start_schedule = {}
         self.communicaton_end_schedule = {}
@@ -49,7 +53,6 @@ class CommunicationManager():
         """
         通信を保存する.
         """
-        print(f"通信時間: {self.service_time}, ロス率: {self.loss()}")
         with open(self.out_file, "a") as f:
             f.write(f"{self.service_time}, {self.loss()}\n")
 
@@ -58,32 +61,68 @@ class CommunicationManager():
         通信のロス率を返す.
         """
         return (self.MAX_TRY_START_NUM - self.communication_start_num) / self.MAX_TRY_START_NUM
+    
+    def set_service_time_by_expovariate(self, average_service_time: int = 1) -> None:
+        """
+        指数分布に従う通信時間を設定する.
+
+        average: 平均 = 1
+        """
+        self.avarage_service_time = average_service_time
+
+    def set_arrival_interval_by_expovariate(self, average_arrival_interval: int = 1) -> None:
+        """
+        指数分布に従う通信の到着間隔を設定する.
+
+        average: 平均 = 1
+        """
+        self.avarage_arrival_interval = average_arrival_interval
+
+    def __print_result(self) -> None:
+        """
+        実験結果を表示する.
+        """
+        print(f"アルゴリズム: {self.ALGORITHM}", end=", ")
+        print(f"サービス時間: {self.service_time}", end=", ")
+        print(f"到着間隔: {self.arrival_interval}", end=", ")
+        print(f"通信開始回数: {self.communication_start_num}", end=", ")
+        print(f"通信開始試行回数: {self.try_start_num}", end=", ")
+        print(f"呼損率: {self.loss()}")
+
+    def __print_status(self) -> None:
+        """
+        現在の通信の状況を出力する.
+        """
+        print(f"通信時間: {self.service_time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}, 呼損率: {self.loss()}")
+        print(f"通信開始スケジュール: {self.communication_start_schedule}")
+        print(f"通信終了スケジュール: {self.communicaton_end_schedule}")
 
     def run(self) -> None:
         """
         通信を実行する.
         """
-        self.network.show()
-        self.network.show_current()
-
         time = 0
         while True:
-            # print(f"time: {time}, is_capable: {self.network.is_capable()}, start: {self.communication_start_num}, end: {self.communication_end_num}")
+            # 現在の通信の状況を出力
+            # self.__print_status()
+
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num < self.MAX_TRY_START_NUM:
                 self.try_start_num += 1
 
                 # 通信の到着
                 s_node, e_node = self.network.random_two_nodes()
-                communication = Communication(self.network, s_node, e_node, self.ALGORITHM)
+                communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
 
-                if self.service_time > 0:
-                    communication.set_service_time_by_int(self.service_time)
-                if self.arrival_interval > 0:
-                    communication.set_arrival_interval_by_int(self.arrival_interval)
+                # サービス時間と到着間隔を設定
+                if self.avarage_service_time > 0:
+                    communication.set_service_time_by_expovariate(self.avarage_service_time)
+                if self.avarage_arrival_interval > 0:
+                    communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
 
                 arrival_interval = communication.get_arrival_interval()
                 if time + arrival_interval in self.communication_start_schedule:
+                    # arrivalじゃなくてservice_time?
                     self.communication_start_schedule[time + arrival_interval].append(communication)
                 else:
                     self.communication_start_schedule[time + arrival_interval] = [communication]
@@ -105,7 +144,6 @@ class CommunicationManager():
             else:
                 # 終了
                 if len(self.communicaton_end_schedule) == 0:
-                    print("通信がすべて終了しました。")
                     break
 
             # 通信の終了
@@ -121,5 +159,7 @@ class CommunicationManager():
         if self.network.get() != self.network.get_current():
             raise Exception("networkとcurrent_networkが一致しません。")
 
+        # 実験の結果を表示
+        self.__print_result()
         # 通信の保存
         self.save()
