@@ -17,31 +17,60 @@ class Communication():
         """
         self.network = network
         self.path = self.get_path(s_node, e_node, algorithm)
-        self.communication_time = 0
-        self.set_communication_time_by_expovariate()
+        self.service_time = 0
+        self.arrival_interval = 0
+        # TODO: ここはなくす。
+        self.set_service_time_by_expovariate()
+        self.set_arrival_interval_by_expovariate()
         self.is_communicating = False
 
-    def set_communication_time_by_expovariate(self, average: int = 10) -> None:
+    # 指数分布を返すプライベートメソッド
+    def __expovariate(self, average: int) -> int:
+        return round(random.expovariate(1 / average))
+
+    def set_service_time_by_expovariate(self, average: int = 10) -> None:
         """
         指数分布に従う通信時間を設定する.
 
         average: 平均
         """
-        self.communication_time = round(random.expovariate(1 / average))
+        self.service_time = self.__expovariate(average)
 
-    def set_communication_time_by_int(self, communication_time: int) -> None:
+    def set_arrival_interval_by_expovariate(self, average: int = 10) -> None:
+        """
+        指数分布に従う通信の到着間隔を設定する.
+
+        average: 平均
+        """
+        self.arrival_interval = self.__expovariate(average)
+
+    def set_service_time_by_int(self, service_time: int) -> None:
         """
         通信時間を設定する.
 
-        communication_time: 通信時間
+        service_time: 通信時間
         """
-        self.communication_time = communication_time
+        self.service_time = service_time
 
-    def get_communication_time(self) -> int:
+    def set_arrival_interval_by_int(self, arrival_interval: int) -> None:
+        """
+        通信の到着間隔を設定する.
+
+        arrival_interval: 通信の到着間隔
+        """
+        self.arrival_interval = arrival_interval
+
+    def get_service_time(self) -> int:
         """
         通信時間を返す.
         """
-        return self.communication_time
+        return self.service_time
+
+    def get_arrival_interval(self) -> int:
+        """
+        通信の到着間隔を返す.
+        """
+        return self.arrival_interval
 
     def get_path(self, s_node: int, e_node: int, algorithm: int) -> list:
         """
