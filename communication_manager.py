@@ -1,7 +1,7 @@
 import os
 
-from network import Network
 from communication import Communication
+from network import Network
 
 
 class CommunicationManager():

@@ -27,7 +27,7 @@ class Communication():
 
         average: 平均
         """
-        self.communication_time = round(random.expovariate(1/average))
+        self.communication_time = round(random.expovariate(1 / average))
 
     def set_communication_time_by_int(self, communication_time: int) -> None:
         """

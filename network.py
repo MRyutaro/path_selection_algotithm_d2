@@ -2,6 +2,7 @@ import heapq
 import random
 from collections import deque
 
+
 class Network():
     def __init__(self) -> None:
         self.networks = [
@@ -53,14 +54,14 @@ class Network():
         nodes = list(range(node_num))
         s_node, e_node = random.sample(nodes, 2)
         return s_node, e_node
-    
-    def adjacent_nodes(self, node: int, networks: list = None) -> list:
+
+    def adjacent_nodes(self, node: int, networks: list = []) -> list:
         """
         ノードに隣接するノードを取得する.
 
         node: ノード
         """
-        if networks is None:
+        if networks == []:
             networks = self.current_networks
 
         return [i for i, x in enumerate(networks[node]) if x > 0]
@@ -76,15 +77,15 @@ class Network():
             return False
 
         # path上のすべてのリンクの容量が1以上あるか確認したあと、容量を1減らす
-        for i in range(len(path)-1):
-            if self.current_networks[path[i]][path[i+1]] < 1:
+        for i in range(len(path) - 1):
+            if self.current_networks[path[i]][path[i + 1]] < 1:
                 return False
 
         # 容量を1減らす
-        for i in range(len(path)-1):
-            self.current_networks[path[i]][path[i+1]] -= 1
-            self.current_networks[path[i+1]][path[i]] -= 1
-            if self.current_networks[path[i]][path[i+1]] < 0:
+        for i in range(len(path) - 1):
+            self.current_networks[path[i]][path[i + 1]] -= 1
+            self.current_networks[path[i + 1]][path[i]] -= 1
+            if self.current_networks[path[i]][path[i + 1]] < 0:
                 raise Exception("current_networksの容量が0以下です。")
 
         return True
@@ -96,29 +97,29 @@ class Network():
         path: 経路
         """
         # パスの容量を1増やす
-        for i in range(len(path)-1):
-            self.current_networks[path[i]][path[i+1]] += 1
-            self.current_networks[path[i+1]][path[i]] += 1
-            if self.current_networks[path[i+1]][path[i]] > self.networks[path[i+1]][path[i]]:
+        for i in range(len(path) - 1):
+            self.current_networks[path[i]][path[i + 1]] += 1
+            self.current_networks[path[i + 1]][path[i]] += 1
+            if self.current_networks[path[i + 1]][path[i]] > self.networks[path[i + 1]][path[i]]:
                 raise Exception("current_networksの容量がnetworksの容量を超えています。")
 
-    def capacity_between(self, s_node: int, e_node: int, networks: list = None) -> int:
+    def capacity_between(self, s_node: int, e_node: int, networks: list = []) -> int:
         """
         ノード間の現在の容量を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        if networks is None:
+        if networks == []:
             networks = self.current_networks
 
         return networks[s_node][e_node]
 
-    def is_capable(self, networks: list = None) -> bool:
+    def is_capable(self, networks: list = []) -> bool:
         """
         ネットワークの容量があるか確認する.
         """
-        if networks is None:
+        if networks == []:
             networks = self.current_networks
 
         for i in range(len(networks)):
@@ -128,14 +129,14 @@ class Network():
                         return True
         return False
 
-    def is_capable_between(self, s_node: int, e_node: int, networks: list = None) -> bool:
+    def is_capable_between(self, s_node: int, e_node: int, networks: list = []) -> bool:
         """
         ノード間に容量があるか確認する.
 
         s_node: 開始ノード
         e_node: 終了ノード
         """
-        if networks is None:
+        if networks == []:
             networks = self.current_networks
 
         return self.capacity_between(s_node, e_node, networks) > 0
@@ -208,8 +209,9 @@ class Network():
             return []
 
         # G'を初期化
-        more_than_max_networks = [[0 for _ in range(len(self.networks))]
-                                    for _ in range(len(self.networks))]
+        more_than_max_networks = [
+            [0 for _ in range(len(self.networks))] for _ in range(len(self.networks))
+        ]
 
         # リンクを重みの大きい順にソート
         links = []

@@ -1,6 +1,5 @@
-from network import Network
 from communication_manager import CommunicationManager as CM
-
+from network import Network
 
 if __name__ == "__main__":
     # 10000回の通信を実行
