@@ -141,7 +141,7 @@ class Network():
 
         return self.capacity_between(s_node, e_node, networks) > 0
 
-    def _path_between(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
+    def __path_between(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
         """
         s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す. 最短かどうかは保障しない.
 
@@ -157,10 +157,12 @@ class Network():
 
         # s_nodeとつながっているノードを探索
         # TODO: adjacent_nodesを使えないか
-        for node in range(len(networks[s_node])):
-            if (node not in path) and (networks[s_node][node] > 0):
+        adjacent_nodes = self.adjacent_nodes(s_node, networks)
+        for node in adjacent_nodes:
+            # すでに通ったノードは探索しない
+            if node not in path:
                 # 再帰的に探索
-                result = self._path_between(node, e_node, networks, path + [node])
+                result = self.__path_between(node, e_node, networks, path + [node])
                 if result:
                     return result
 
