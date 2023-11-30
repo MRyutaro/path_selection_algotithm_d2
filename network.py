@@ -156,7 +156,6 @@ class Network():
             return path
 
         # s_nodeとつながっているノードを探索
-        # TODO: adjacent_nodesを使えないか
         adjacent_nodes = self.adjacent_nodes(s_node, networks)
         for node in adjacent_nodes:
             # すでに通ったノードは探索しない
