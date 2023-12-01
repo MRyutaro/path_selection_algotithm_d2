@@ -54,7 +54,7 @@ class CommunicationManager():
         通信を保存する.
         """
         with open(self.out_file, "a") as f:
-            f.write(f"{self.service_time}, {self.loss()}\n")
+            f.write(f"{self.service_time},{self.loss()}\n")
 
     def loss(self) -> float:
         """
