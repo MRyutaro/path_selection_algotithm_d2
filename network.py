@@ -170,7 +170,7 @@ class Network():
 
     def shortest_path_between(self, s_node: int, e_node: int, networks: list) -> list:
         """
-        ノード間の最短路(ノード数が一番少ない経路)を返す.
+        ノード間の最小ホップ経路を返す.
 
         s_node: 開始ノード
         e_node: 終了ノード

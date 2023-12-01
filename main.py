@@ -1,9 +1,12 @@
 from communication_manager import CommunicationManager as CM
-from network import Network
 
 if __name__ == "__main__":
-    # 10000回の通信を実行
-    network = Network()
-    # TODO: アルゴリズムとパラメタnを変化させる
-    cm = CM(algorithm=1, service_time=20)
-    cm.run()
+    experiment_num = 10
+    algorithms = [2]
+    service_times = [i for i in range(1, 500)]
+    for algorithm in algorithms:
+        print(f"algorithm: {algorithm}")
+        for service_time in service_times:
+            for _ in range(experiment_num):
+                cm = CM(algorithm=algorithm, service_time=service_time)
+                cm.run()

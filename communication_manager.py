@@ -160,6 +160,6 @@ class CommunicationManager():
             raise Exception("networkとcurrent_networkが一致しません。")
 
         # 実験の結果を表示
-        self.__print_result()
+        # self.__print_result()
         # 通信の保存
         self.save()
