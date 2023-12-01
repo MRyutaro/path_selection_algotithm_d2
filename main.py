@@ -5,7 +5,7 @@ if __name__ == "__main__":
     # 実験1（サービス時間、到着間隔を固定する場合）
     # ==========
     experiment_num = 10
-    algorithms = [2]
+    algorithms = [3, 4]
     service_times = [i for i in range(1, 500)]
 
     for algorithm in algorithms:
