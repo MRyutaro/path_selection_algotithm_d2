@@ -59,7 +59,8 @@ class Network():
         """
         ノードに隣接するノードを取得する.
 
-        node: ノード
+        引数
+        - node: ノード
         """
         if networks == []:
             networks = self.current_networks
@@ -70,7 +71,8 @@ class Network():
         """
         ネットワークの開始. 容量を減らす.
 
-        path: 経路
+        引数
+        - path: 経路
         """
         # パスが空、すなわち経路がない場合は通信は失敗
         if len(path) == 0:
@@ -94,7 +96,8 @@ class Network():
         """
         ネットワークの終了. 容量を増やす.
 
-        path: 経路
+        引数
+        - path: 経路
         """
         # パスの容量を1増やす
         for i in range(len(path) - 1):
@@ -107,8 +110,10 @@ class Network():
         """
         ノード間の現在の容量を返す.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - networks: ネットワーク (デフォルトは現在のネットワーク)
         """
         if networks == []:
             networks = self.current_networks
@@ -133,8 +138,10 @@ class Network():
         """
         ノード間に容量があるか確認する.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - networks: ネットワーク (デフォルトは現在のネットワーク)
         """
         if networks == []:
             networks = self.current_networks
@@ -145,8 +152,11 @@ class Network():
         """
         s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す. 最短かどうかは保障しない.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - networks: ネットワーク
+        - path: 経路 (デフォルトは空リスト)
         """
         if len(path) == 0:
             path.append(s_node)
@@ -172,8 +182,10 @@ class Network():
         """
         ノード間の最小ホップ経路を返す.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - networks: ネットワーク
         """
         # 空き容量がなければ、空リストを返す
         if not self.is_capable(networks):
@@ -201,9 +213,10 @@ class Network():
         """
         ノード間の最大路(一番通信容量を大きくできる経路)を返す.
 
-        s_node: 開始ノード
-        e_node: 終了ノード
-        networks: ネットワーク
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - networks: ネットワーク
         """
         # 空き容量がなければ、空リストを返す
         if not self.is_capable(networks):

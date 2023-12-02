@@ -4,16 +4,23 @@ from network import Network
 
 
 class Communication():
+    """
+    1回の通信を管理するクラス。
+    """
     def __init__(self, network: Network, s_node: int, e_node: int, algorithm: int, service_time: int = 1, arrival_interval: int = 1) -> None:
         """
-        network: ネットワーク
-        s_node: 開始ノード
-        e_node: 終了ノード
-        algorithm: 経路の決定方法
-        1 => 最小ホップ経路を用いた固定経路
-        2 => 最大路を用いた固定経路
-        3 => 最小ホップ経路を用いた要求時経路
-        4 => 最大路を用いた要求時経路
+        コンストラクタ。
+
+        引数
+        - network: ネットワーク
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - algorithm: 経路の決定方法
+            - 1: 最小ホップ経路を用いた固定経路
+            - 2: 最大路を用いた固定経路
+            - 3: 最小ホップ経路を用いた要求時経路
+            - 4: 最大路を用いた要求時経路
+            - 5: 最短最大路
         """
         self.network = network
         self.path = self.get_path(s_node, e_node, algorithm)
@@ -21,51 +28,53 @@ class Communication():
         self.arrival_interval = arrival_interval
         self.is_communicating = False
 
-    # 指数分布を返すプライベートメソッド
     def __expovariate(self, average: int) -> int:
         # TODO: 0を返さないようにする。
         return round(random.expovariate(1 / average))
 
     def set_service_time_by_expovariate(self, average_service_time: int = 1) -> None:
         """
-        指数分布に従う通信時間を設定する.
+        指数分布に従う通信時間を設定する。
 
-        average: 平均
+        引数
+        - average: 平均（初期値は1）
         """
         self.service_time = self.__expovariate(average_service_time)
 
     def set_arrival_interval_by_expovariate(self, average_arrival_interval: int = 1) -> None:
         """
-        指数分布に従う通信の到着間隔を設定する.
+        指数分布に従う通信の到着間隔を設定する。
 
-        average: 平均
+        引数
+        - average: 平均（初期値は1）
         """
         self.arrival_interval = self.__expovariate(average_arrival_interval)
 
     def get_service_time(self) -> int:
         """
-        通信時間を返す.
+        通信時間を返す。
         """
         return self.service_time
 
     def get_arrival_interval(self) -> int:
         """
-        通信の到着間隔を返す.
+        通信の到着間隔を返す。
         """
         return self.arrival_interval
 
     def get_path(self, s_node: int, e_node: int, algorithm: int) -> list:
         """
-        経路の決定.
+        経路を取得する。
 
-        s_node: 開始ノード
-        e_node: 終了ノード
-        algorithm: 経路の決定方法
-        1 => 最小ホップ経路を用いた固定経路
-        2 => 最大路を用いた固定経路
-        3 => 最小ホップ経路を用いた要求時経路
-        4 => 最大路を用いた要求時経路
-        5 => 最短最大路
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - algorithm: 経路の決定方法
+            - 1: 最小ホップ経路を用いた固定経路
+            - 2: 最大路を用いた固定経路
+            - 3: 最小ホップ経路を用いた要求時経路
+            - 4: 最大路を用いた要求時経路
+            - 5: 最短最大路
         """
         # TODO: 5を実装する
         if algorithm == 1:
@@ -81,10 +90,7 @@ class Communication():
 
     def start(self) -> bool:
         """
-        通信の開始. もし容量があれば容量を1減らし、Trueを返す.
-
-        s_node: 開始ノード
-        e_node: 終了ノード
+        通信の開始。もし容量があれば容量を1減らし、Trueを返す。
         """
         if self.is_communicating:
             raise Exception("通信中です。")
@@ -97,7 +103,7 @@ class Communication():
 
     def end(self) -> None:
         """
-        通信の終了. 容量を増やす.
+        通信の終了。容量を増やす。
         """
         if not self.is_communicating:
             raise Exception("通信が開始されていません。")

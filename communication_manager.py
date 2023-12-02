@@ -5,15 +5,22 @@ from network import Network
 
 
 class CommunicationManager():
+    """
+    通信を管理するクラス。
+    """
     def __init__(self, algorithm: int = 1, service_time: int = 1, arrival_interval: int = 1) -> None:
         """
-        algorithm: 通信のアルゴリズム
-        1 => 最小ホップ経路を用いた固定経路
-        2 => 最大路を用いた固定経路
-        3 => 最小ホップ経路を用いた要求時経路
-        4 => 最大路を用いた要求時経路
-        service_time: 通信時間
-        arrival_interval: 通信の到着間隔
+        コンストラクタ。
+
+        引数
+        - algorithm: 通信のアルゴリズム
+            - 1: 最小ホップ経路を用いた固定経路
+            - 2: 最大路を用いた固定経路
+            - 3: 最小ホップ経路を用いた要求時経路
+            - 4: 最大路を用いた要求時経路
+            - 5: 最短最大路
+        - service_time: 通信時間（初期値は1）
+        - arrival_interval: 通信の到着間隔（初期値は1）
         """
         self.network = Network()
         self.ALGORITHM = algorithm
@@ -41,7 +48,7 @@ class CommunicationManager():
 
     def setup(self) -> None:
         """
-        出力ファイルの作成.
+        出力ファイルを作成する。
         """
         if not os.path.isdir("data"):
             os.mkdir("data")
@@ -51,36 +58,38 @@ class CommunicationManager():
 
     def save(self) -> None:
         """
-        通信を保存する.
+        通信を保存する。
         """
         with open(self.out_file, "a") as f:
             f.write(f"{self.service_time},{self.loss()}\n")
 
     def loss(self) -> float:
         """
-        通信のロス率を返す.
+        通信のロス率を返す。
         """
         return (self.MAX_TRY_START_NUM - self.communication_start_num) / self.MAX_TRY_START_NUM
     
     def set_service_time_by_expovariate(self, average_service_time: int = 1) -> None:
         """
-        指数分布に従う通信時間を設定する.
+        指数分布に従う通信時間を設定する。
 
-        average: 平均 = 1
+        引数
+        - average: 平均（初期値は1）
         """
         self.avarage_service_time = average_service_time
 
     def set_arrival_interval_by_expovariate(self, average_arrival_interval: int = 1) -> None:
         """
-        指数分布に従う通信の到着間隔を設定する.
+        指数分布に従う通信の到着間隔を設定する。
 
-        average: 平均 = 1
+        引数
+        - average: 平均（初期値は1）
         """
         self.avarage_arrival_interval = average_arrival_interval
 
     def __print_result(self) -> None:
         """
-        実験結果を表示する.
+        実験結果を表示する。
         """
         print(f"アルゴリズム: {self.ALGORITHM}", end=", ")
         print(f"サービス時間: {self.service_time}", end=", ")
@@ -91,7 +100,7 @@ class CommunicationManager():
 
     def __print_status(self) -> None:
         """
-        現在の通信の状況を出力する.
+        現在の通信の状況を出力する。
         """
         print(f"通信時間: {self.service_time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}, 呼損率: {self.loss()}")
         print(f"通信開始スケジュール: {self.communication_start_schedule}")
@@ -99,7 +108,7 @@ class CommunicationManager():
 
     def run(self) -> None:
         """
-        通信を実行する.
+        通信を実行する。
         """
         time = 0
         while True:
