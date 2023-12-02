@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # 4: dynamic widest path
     # 5: static shortest widest path
     # 6: dynamic shortest widest path
-    algorithms = [5, 6]
+    algorithms = [1, 2, 3, 4, 5, 6]
     # サービス時間。初期値は1から500までの整数
     service_times = [i for i in range(1, 500)]
 

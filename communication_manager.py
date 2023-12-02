@@ -55,7 +55,7 @@ class CommunicationManager():
             os.mkdir("data")
         if not os.path.isfile(self.out_file):
             with open(self.out_file, "w") as f:
-                f.write("service_time, loss\n")
+                f.write("service_time,loss\n")
 
     def save(self) -> None:
         """
