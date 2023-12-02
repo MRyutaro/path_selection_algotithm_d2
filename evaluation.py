@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 file_path = [
     'data/confirm/algorithm_1_out.csv',
