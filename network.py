@@ -148,22 +148,28 @@ class Network():
 
         return self.capacity_between(s_node, e_node, networks) > 0
 
-    def __path_between(self, s_node: int, e_node: int, networks: list, path: list = []) -> list:
+    def __path_between(self, s_node: int, e_node: int, networks: list, path: list = [], memo: dict = {}) -> tuple:
         """
-        s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路を返す. 最短かどうかは保障しない.
+        s_nodeとつながっているノードを取得し、再帰的に探索. e_nodeが見つかれば経路とTrueを返す. 最短かどうかは保障しない.
 
         引数
         - s_node: 開始ノード
         - e_node: 終了ノード
         - networks: ネットワーク
-        - path: 経路 (デフォルトは空リスト)
+        - path: 経路（デフォルトは空のリスト）
+        - memo: メモ (デフォルトは空の辞書)
         """
         if len(path) == 0:
             path.append(s_node)
 
-        # 終了ノードに到達した場合は経路を返す
+        # 終了ノードに到達した場合は経路とTrueを返す
         if s_node == e_node:
-            return path
+            return path, True
+
+        # メモが存在する場合は再計算せずに結果を返す
+        memo_key = (s_node, e_node)
+        if memo_key in memo:
+            return memo[memo_key]
 
         # s_nodeとつながっているノードを探索
         adjacent_nodes = self.adjacent_nodes(s_node, networks)
@@ -171,12 +177,15 @@ class Network():
             # すでに通ったノードは探索しない
             if node not in path:
                 # 再帰的に探索
-                result = self.__path_between(node, e_node, networks, path + [node])
-                if result:
-                    return result
+                result, found = self.__path_between(node, e_node, networks, path + [node], memo)
+                if found:
+                    # 経路が見つかればメモに保存して経路とTrueを返す
+                    memo[memo_key] = result, True
+                    return result, True
 
-        # 経路が見つからない場合は空リストを返す
-        return []
+        # 経路が見つからない場合はメモに保存して空リストとFalseを返す
+        memo[memo_key] = [], False
+        return [], False
 
     def shortest_path_between(self, s_node: int, e_node: int, networks: list) -> list:
         """
@@ -244,8 +253,8 @@ class Network():
             more_than_max_networks[link[1]][link[2]] = -link[0]
             more_than_max_networks[link[2]][link[1]] = -link[0]
 
-            path = self.__path_between(s_node, e_node, more_than_max_networks)
-            if path:
+            path, found = self.__path_between(s_node, e_node, more_than_max_networks)
+            if found:
                 # 経路があれば、経路を返す
                 return path
 

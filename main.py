@@ -4,8 +4,11 @@ if __name__ == "__main__":
     # ==========
     # 実験1（サービス時間、到着間隔を固定する場合）
     # ==========
+    # 実験回数.。初期値は10
     experiment_num = 10
-    algorithms = [3, 4]
+    # アルゴリズム。初期値は[1, 2, 3, 4, 5]
+    algorithms = [1, 2, 3, 4]
+    # サービス時間。初期値は1から500までの整数
     service_times = [i for i in range(1, 500)]
 
     for algorithm in algorithms:
