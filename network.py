@@ -252,6 +252,49 @@ class Network():
         # 経路がなければ、空リストを返す
         return []
 
+    def shortest_widest_path_between(self, s_node: int, e_node: int, networks: list) -> list:
+        """
+        ノード間の最短最大路を返す。
+        
+        引数
+        - s_node: 開始ノード
+        - e_node: 終了ノード
+        - networks: ネットワーク
+        """
+        # 空き容量がなければ、空リストを返す
+        if not self.is_capable(networks):
+            return []
+
+        # G'を初期化
+        more_than_max_networks = [
+            [0 for _ in range(len(self.networks))] for _ in range(len(self.networks))
+        ]
+
+        # リンクを重みの大きい順にソート
+        links = []
+        for i in range(len(networks)):
+            for j in range(len(networks[i])):
+                if i < j:
+                    if self.is_capable_between(i, j, networks):
+                        heapq.heappush(links, (-networks[i][j], i, j))
+
+        # リンクを大きい順に取り出し、経路を作成
+        while links:
+            # リンクを取り出す
+            link = heapq.heappop(links)
+
+            # 経路にリンクを追加
+            more_than_max_networks[link[1]][link[2]] = -link[0]
+            more_than_max_networks[link[2]][link[1]] = -link[0]
+
+            path = self.shortest_path_between(s_node, e_node, more_than_max_networks)
+            if path:
+                # 経路があれば、経路を返す
+                return path
+
+        # 経路がなければ、空リストを返す
+        return []
+
 
 if __name__ == "__main__":
     # ネットワークのインスタンスを作成
