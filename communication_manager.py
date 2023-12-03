@@ -6,9 +6,9 @@ from network import Network
 
 class CommunicationManager():
     """
-    通信を管理するクラス。
+    通信を管理するオブジェクト。
     """
-    def __init__(self, algorithm: int = 1, service_time: int = 1, arrival_interval: int = 1, average_service_time: int = 0, average_arrival_interval: int = 0) -> None:
+    def __init__(self, algorithm, service_time: int = 1, arrival_interval: int = 1, average_service_time: int = 0, average_arrival_interval: int = 0) -> None:
         """
         コンストラクタ。
 

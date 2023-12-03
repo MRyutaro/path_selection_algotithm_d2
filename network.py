@@ -5,6 +5,9 @@ from collections import deque
 
 
 class Network():
+    """
+    ネットワークを表すオブジェクト。
+    """
     def __init__(self) -> None:
         self.networks = [
             [0, 3, 0, 3, 0, 0, 0, 0, 0, 0],  # 0

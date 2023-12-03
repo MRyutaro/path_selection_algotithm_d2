@@ -5,7 +5,7 @@ from network import Network
 
 class Communication():
     """
-    1回の通信を管理するクラス。
+    1回の通信を管理するオブジェクト。
     """
     def __init__(self, network: Network, s_node: int, e_node: int, algorithm: int, service_time: int = 1, arrival_interval: int = 1) -> None:
         """
