@@ -1,4 +1,5 @@
 from communication_manager import CommunicationManager as CM
+import datetime
 
 if __name__ == "__main__":
     # ==========
@@ -15,15 +16,17 @@ if __name__ == "__main__":
     # 6: dynamic shortest widest path
     algorithms = [1, 2, 3, 4, 5, 6]
     # サービス時間。初期値は1から500までの整数
-    service_times = [i for i in range(1, 500)]
+    service_times = [i for i in range(1, 501)]
 
     for algorithm in algorithms:
         print(f"algorithm: {algorithm}")
         for service_time in service_times:
-            print(f"service_time: {service_time}")
+            print(f"service_time: {service_time}", end=", ")
+            now = datetime.datetime.now()
             for _ in range(experiment_num):
                 cm = CM(algorithm=algorithm, service_time=service_time)
                 cm.run()
+            print(f"time: {datetime.datetime.now() - now}")
 
     # ==========
     # 実験2(指数分布に従うサービス時間、到着間隔を生成する場合)
