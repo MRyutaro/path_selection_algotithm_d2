@@ -118,8 +118,6 @@ class CommunicationManager():
 
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num < self.MAX_TRY_START_NUM:
-                self.try_start_num += 1
-
                 # 通信の到着
                 s_node, e_node = self.network.random_two_nodes()
                 communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
@@ -132,7 +130,6 @@ class CommunicationManager():
 
                 arrival_interval = communication.get_arrival_interval()
                 if time + arrival_interval in self.communication_start_schedule:
-                    # arrivalじゃなくてservice_time?
                     self.communication_start_schedule[time + arrival_interval].append(communication)
                 else:
                     self.communication_start_schedule[time + arrival_interval] = [communication]
@@ -140,6 +137,7 @@ class CommunicationManager():
                 # 通信の開始
                 if time in self.communication_start_schedule:
                     for communication in self.communication_start_schedule[time]:
+                        self.try_start_num += 1
                         if communication.start():
                             self.communication_start_num += 1
                             service_time = communication.get_service_time()
@@ -173,3 +171,8 @@ class CommunicationManager():
         # self.__print_result()
         # 通信の保存
         self.save()
+
+
+if __name__ == "__main__":
+    cm = CommunicationManager(algorithm=1)
+    cm.run()
