@@ -2,13 +2,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+experiment = 1
+
 file_path = [
-    'data/confirm/algorithm_1_out.csv',
-    'data/confirm/algorithm_2_out.csv',
-    'data/confirm/algorithm_3_out.csv',
-    'data/confirm/algorithm_4_out.csv',
-    'data/confirm/algorithm_5_out.csv',
-    'data/confirm/algorithm_6_out.csv'
+    f'data/{experiment}/algorithm_1_out.csv',
+    f'data/{experiment}/algorithm_2_out.csv',
+    f'data/{experiment}/algorithm_3_out.csv',
+    f'data/{experiment}/algorithm_4_out.csv',
+    f'data/{experiment}/algorithm_5_out.csv',
+    f'data/{experiment}/algorithm_6_out.csv'
 ]
 
 algorithms = [
