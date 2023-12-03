@@ -8,7 +8,7 @@ class CommunicationManager():
     """
     通信を管理するクラス。
     """
-    def __init__(self, algorithm: int = 1, service_time: int = 1, arrival_interval: int = 1) -> None:
+    def __init__(self, algorithm: int = 1, service_time: int = 1, arrival_interval: int = 1, average_service_time: int = 0, average_arrival_interval: int = 0) -> None:
         """
         コンストラクタ。
 
@@ -38,8 +38,8 @@ class CommunicationManager():
         if self.arrival_interval < 0:
             raise Exception("通信の到着間隔は0以上である必要があります。")
         # サービス時間と到着間隔は指数分布に従う. 0で初期化
-        self.avarage_service_time = 0
-        self.avarage_arrival_interval = 0
+        self.avarage_service_time = average_service_time
+        self.avarage_arrival_interval = average_arrival_interval
 
         self.communication_start_schedule = {}
         self.communicaton_end_schedule = {}
