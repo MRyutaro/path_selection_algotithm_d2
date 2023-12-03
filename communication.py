@@ -80,7 +80,6 @@ class Communication():
             - 5: 最短最大路を用いた固定経路
             - 6: 最短最大路を用いた要求時経路
         """
-        # TODO: 5を実装する
         if algorithm == 1:
             return self.network.shortest_path_between(s_node, e_node, self.network.get())
         elif algorithm == 2:
