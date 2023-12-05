@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-experiment = 2
+experiment = 3
 
 file_path = [
     f'data/ex2/{experiment}/algorithm_1_out.csv',
@@ -25,7 +25,6 @@ algorithms = [
 plt.xlabel('Average Service Time / Average Arrival Interval')
 plt.ylabel('Average Loss')
 plt.grid(True)
-# plt.yscale('log')
 
 for i, path in enumerate(file_path):
     df = pd.read_csv(path, encoding='utf-8')
