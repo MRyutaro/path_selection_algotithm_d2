@@ -41,8 +41,8 @@ class CommunicationManager():
         self.avarage_service_time = average_service_time
         self.avarage_arrival_interval = average_arrival_interval
 
-        self.communication_start_schedule = {}
-        self.communicaton_end_schedule = {}
+        self.communication_start_schedule: dict[int, list[Communication]] = {}
+        self.communicaton_end_schedule: dict[int, list[Communication]] = {}
 
         self.out_file = f"data/algorithm_{self.ALGORITHM}_out.csv"
         self.setup()
@@ -129,6 +129,9 @@ class CommunicationManager():
                     communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
 
                 arrival_interval = communication.get_arrival_interval()
+                if arrival_interval <= 0:
+                    raise Exception("通信の到着間隔は0より大きい必要があります。")
+
                 if time + arrival_interval in self.communication_start_schedule:
                     self.communication_start_schedule[time + arrival_interval].append(communication)
                 else:
@@ -141,6 +144,9 @@ class CommunicationManager():
                         if communication.start():
                             self.communication_start_num += 1
                             service_time = communication.get_service_time()
+                            if service_time <= 0:
+                                raise Exception("通信時間は0より大きい必要があります。")
+
                             if time + service_time in self.communicaton_end_schedule:
                                 self.communicaton_end_schedule[time + service_time].append(communication)
                             else:
