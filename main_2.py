@@ -1,5 +1,6 @@
-from communication_manager import CommunicationManager as CM
 import datetime
+
+from communication_manager import CommunicationManager as CM
 
 if __name__ == "__main__":
     # ==========

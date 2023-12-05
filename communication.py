@@ -1,4 +1,5 @@
 import numpy.random as random
+
 from network import Network
 
 
