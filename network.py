@@ -246,9 +246,9 @@ class Network():
             links = weight_sorted_links[weight]
             # G'にリンクを追加
             for link in links:
-                s_node, e_node = link
-                more_than_max_networks[s_node][e_node] = weight
-                more_than_max_networks[e_node][s_node] = weight
+                added_s_node, added_e_node = link
+                more_than_max_networks[added_s_node][added_e_node] = weight
+                more_than_max_networks[added_e_node][added_s_node] = weight
             # 経路を作成
             path = self.path_between(s_node, e_node, more_than_max_networks)
             # 経路があれば、経路を返す
@@ -293,9 +293,9 @@ class Network():
             links = weight_sorted_links[weight]
             # G'にリンクを追加
             for link in links:
-                s_node, e_node = link
-                more_than_max_networks[s_node][e_node] = weight
-                more_than_max_networks[e_node][s_node] = weight
+                added_s_node, added_e_node = link
+                more_than_max_networks[added_s_node][added_e_node] = weight
+                more_than_max_networks[added_e_node][added_s_node] = weight
             # 最小ホップ経路を作成
             shortest_path = self.shortest_path_between(s_node, e_node, more_than_max_networks)
             # 経路があれば、経路を返す
@@ -320,7 +320,7 @@ if __name__ == "__main__":
 
         # ==========
         # 深さ優先探索で経路を求める
-        path = network.path_between(start_node, end_node, network.get())
+        # path = network.path_between(start_node, end_node, network.get())
         # 結果を表示
         # print(f"Path from Node {start_node} to Node {end_node}: {path}")
         # ==========
@@ -334,9 +334,9 @@ if __name__ == "__main__":
 
         # ==========
         # # 最大路を求める
-        # widest_path = network.widest_path_between(start_node, end_node, network.get())
+        widest_path = network.widest_path_between(start_node, end_node, network.get())
         # # 結果を表示
-        # print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
+        print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
         # ==========
 
     print(f"time: {datetime.datetime.now() - now}")
