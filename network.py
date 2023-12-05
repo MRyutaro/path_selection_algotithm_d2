@@ -1,7 +1,6 @@
-import heapq
+from collections import deque
 import numpy as np
 import random
-from collections import deque
 
 
 class Network():
@@ -27,7 +26,7 @@ class Network():
         return self.networks
 
     def show(self) -> None:
-        print("===networks===")
+        print("networks")
         for i in range(len(self.networks)):
             print(self.networks[i])
 
@@ -35,7 +34,7 @@ class Network():
         return self.current_networks
 
     def show_current(self) -> None:
-        print("===current_networks===")
+        print("current_networks")
         for i in range(len(self.current_networks)):
             print(self.current_networks[i])
 
