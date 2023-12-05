@@ -340,11 +340,3 @@ if __name__ == "__main__":
         # ==========
 
     print(f"time: {datetime.datetime.now() - now}")
-
-
-if __name__ == "__main__":
-    network = Network()
-    s_node, e_node = network.random_two_nodes()
-    print(f"start_node: {s_node}, end_node: {e_node}")
-
-    widest_path_between = network.widest_path_between(s_node, e_node, network.get())
