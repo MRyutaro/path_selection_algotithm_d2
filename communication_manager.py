@@ -56,14 +56,20 @@ class CommunicationManager():
             os.mkdir("data")
         if not os.path.isfile(self.out_file):
             with open(self.out_file, "w") as f:
-                f.write("service_time,loss\n")
+                if self.avarage_service_time > 0 and self.avarage_arrival_interval > 0:
+                    f.write("average_service_time,average_arrival_interval,loss\n")
+                else:
+                    f.write("service_time,loss\n")
 
     def save(self) -> None:
         """
         通信を保存する。
         """
         with open(self.out_file, "a") as f:
-            f.write(f"{self.service_time},{self.loss()}\n")
+            if self.avarage_service_time > 0 and self.avarage_arrival_interval > 0:
+                f.write(f"{self.avarage_service_time},{self.avarage_arrival_interval},{self.loss()}\n")
+            else:
+                f.write(f"{self.service_time},{self.loss()}\n")
 
     def loss(self) -> float:
         """
