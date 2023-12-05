@@ -79,12 +79,17 @@ class Network():
             if self.current_networks[path[i]][path[i + 1]] < 1:
                 return False
 
+        # networkの総和を計算
+        # sum_network = sum([sum(row) for row in self.current_networks])
+        # print(f"sum_network: {sum_network/2}")
+
         # 容量を1減らす
         for i in range(len(path) - 1):
             self.current_networks[path[i]][path[i + 1]] -= 1
             self.current_networks[path[i + 1]][path[i]] -= 1
             if self.current_networks[path[i]][path[i + 1]] < 0:
                 raise Exception("current_networksの容量が0以下です。")
+
 
         return True
 
