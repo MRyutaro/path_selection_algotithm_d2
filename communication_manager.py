@@ -201,10 +201,10 @@ class CommunicationManager():
 
 
 if __name__ == "__main__":
-    algorithm = 2
-    service_time = 20
-    average_service_time = 0
-    average_arrival_interval = 0
+    algorithm = 4
+    service_time = 0
+    average_service_time = 2
+    average_arrival_interval = 1
     cm = CommunicationManager(
         algorithm=algorithm,
         service_time=service_time,
