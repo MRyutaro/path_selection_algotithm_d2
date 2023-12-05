@@ -110,10 +110,9 @@ class CommunicationManager():
         """
         現在の通信の状況を出力する。
         """
-        print(f"時間: {time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}")
-        print(f"通信開始スケジュール: {self.communication_start_schedule}")
-        print(f"通信終了スケジュール: {self.communicaton_end_schedule}")
-        # self.network.show_current()
+        print(f"時間: {time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}", end=", ")
+        print(f"通信開始スケジュールの長さ: {len(self.communication_start_schedule)}", end=", ")
+        print(f"通信終了スケジュールの長さ: {len(self.communicaton_end_schedule)}")
 
     def run(self) -> None:
         """
@@ -196,11 +195,12 @@ class CommunicationManager():
 
 
 if __name__ == "__main__":
+    algorithm = 2
     service_time = 20
-    average_service_time = 100
-    average_arrival_interval = 5
+    average_service_time = 0
+    average_arrival_interval = 0
     cm = CommunicationManager(
-        algorithm=1,
+        algorithm=algorithm,
         service_time=service_time,
         average_service_time=average_service_time,
         average_arrival_interval=average_arrival_interval
