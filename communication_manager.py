@@ -37,7 +37,7 @@ class CommunicationManager():
             raise Exception("通信時間は0以上である必要があります。")
         if self.arrival_interval < 0:
             raise Exception("通信の到着間隔は0以上である必要があります。")
-        # サービス時間と到着間隔は指数分布に従う。0で初期化
+        # サービス時間と到着間隔は幾何分布に従う。0で初期化
         self.avarage_service_time = average_service_time
         self.avarage_arrival_interval = average_arrival_interval
 
@@ -71,18 +71,18 @@ class CommunicationManager():
         """
         return (self.MAX_TRY_START_NUM - self.communication_start_num) / self.MAX_TRY_START_NUM
     
-    def set_service_time_by_expovariate(self, average_service_time: int = 1) -> None:
+    def set_service_time_by_geometric_distribution(self, average_service_time: int = 1) -> None:
         """
-        指数分布に従う通信時間を設定する。
+        幾何分布に従う通信時間を設定する。
 
         引数
         - average: 平均（初期値は1）
         """
         self.avarage_service_time = average_service_time
 
-    def set_arrival_interval_by_expovariate(self, average_arrival_interval: int = 1) -> None:
+    def set_arrival_interval_by_geometric_distribution(self, average_arrival_interval: int = 1) -> None:
         """
-        指数分布に従う通信の到着間隔を設定する。
+        幾何分布に従う通信の到着間隔を設定する。
 
         引数
         - average: 平均（初期値は1）
@@ -94,8 +94,14 @@ class CommunicationManager():
         実験結果を表示する。
         """
         print(f"アルゴリズム: {self.ALGORITHM}", end=", ")
-        print(f"サービス時間: {self.service_time}", end=", ")
-        print(f"到着間隔: {self.arrival_interval}", end=", ")
+        if self.avarage_service_time > 0:
+            print(f"サービス時間の平均: {self.avarage_service_time}", end=", ")
+        else:
+            print(f"サービス時間: {self.service_time}", end=", ")
+        if self.avarage_arrival_interval > 0:
+            print(f"到着間隔の平均: {self.avarage_arrival_interval}", end=", ")
+        else:
+            print(f"到着間隔: {self.arrival_interval}", end=", ")
         print(f"通信開始回数: {self.communication_start_num}", end=", ")
         print(f"通信開始試行回数: {self.try_start_num}", end=", ")
         print(f"呼損率: {self.loss()}")
@@ -119,9 +125,9 @@ class CommunicationManager():
         s_node, e_node = self.network.random_two_nodes()
         communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
         if self.avarage_service_time > 0:
-            communication.set_service_time_by_expovariate(self.avarage_service_time)
+            communication.set_service_time_by_geometric_distribution(self.avarage_service_time)
         if self.avarage_arrival_interval > 0:
-            communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
+            communication.set_arrival_interval_by_geometric_distribution(self.avarage_arrival_interval)
         arrival_interval = communication.get_arrival_interval()
         if arrival_interval <= 0:
             raise Exception("通信の到着間隔は0より大きい必要があります。")
@@ -156,9 +162,9 @@ class CommunicationManager():
                     s_node, e_node = self.network.random_two_nodes()
                     communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
                     if self.avarage_service_time > 0:
-                        communication.set_service_time_by_expovariate(self.avarage_service_time)
+                        communication.set_service_time_by_geometric_distribution(self.avarage_service_time)
                     if self.avarage_arrival_interval > 0:
-                        communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
+                        communication.set_arrival_interval_by_geometric_distribution(self.avarage_arrival_interval)
                     arrival_interval = communication.get_arrival_interval()
                     if arrival_interval <= 0:
                         raise Exception("通信の到着間隔は0より大きい必要があります。")
@@ -191,6 +197,13 @@ class CommunicationManager():
 
 if __name__ == "__main__":
     service_time = 20
-    cm = CommunicationManager(algorithm=1, service_time=service_time)
+    average_service_time = 100
+    average_arrival_interval = 5
+    cm = CommunicationManager(
+        algorithm=1,
+        service_time=service_time,
+        average_service_time=average_service_time,
+        average_arrival_interval=average_arrival_interval
+    )
     cm.run()
     cm.print_result()

@@ -1,5 +1,4 @@
-import random
-
+import numpy.random as random
 from network import Network
 
 
@@ -26,32 +25,31 @@ class Communication():
         - arrival_interval: 通信の到着間隔（初期値は1）
         """
         self.network = network
-        self.path = self.get_path(s_node, e_node, algorithm)
+        self.path = self.decide_path(s_node, e_node, algorithm)
         self.service_time = service_time
         self.arrival_interval = arrival_interval
         self.is_communicating = False
 
-    def __expovariate(self, average: int) -> int:
-        # TODO: 0を返さないようにする。
-        return round(random.expovariate(1 / average))
+    def __getmetric_distribution(self, average: int) -> int:
+        return random.geometric(1 / average)
 
-    def set_service_time_by_expovariate(self, average_service_time: int = 1) -> None:
+    def set_service_time_by_geometric_distribution(self, average: int = 1) -> None:
         """
-        指数分布に従う通信時間を設定する。
-
-        引数
-        - average: 平均（初期値は1）
-        """
-        self.service_time = self.__expovariate(average_service_time)
-
-    def set_arrival_interval_by_expovariate(self, average_arrival_interval: int = 1) -> None:
-        """
-        指数分布に従う通信の到着間隔を設定する。
+        幾何分布に従う通信時間を設定する。
 
         引数
         - average: 平均（初期値は1）
         """
-        self.arrival_interval = self.__expovariate(average_arrival_interval)
+        self.service_time = self.__getmetric_distribution(average)
+
+    def set_arrival_interval_by_geometric_distribution(self, average: int = 1) -> None:
+        """
+        幾何分布に従う通信の到着間隔を設定する。
+
+        引数
+        - average: 平均（初期値は1）
+        """
+        self.arrival_interval = self.__getmetric_distribution(average)
 
     def get_service_time(self) -> int:
         """
@@ -64,10 +62,16 @@ class Communication():
         通信の到着間隔を返す。
         """
         return self.arrival_interval
-
-    def get_path(self, s_node: int, e_node: int, algorithm: int) -> list:
+    
+    def get_path(self) -> list:
         """
-        経路を取得する。
+        経路を返す。
+        """
+        return self.path
+
+    def decide_path(self, s_node: int, e_node: int, algorithm: int) -> list:
+        """
+        経路を決定する。
 
         引数
         - s_node: 開始ノード
@@ -123,9 +127,6 @@ if __name__ == "__main__":
     network = Network()
     s_node, e_node = network.random_two_nodes()
     communication = Communication(network, s_node, e_node, 3)
-    print(communication.path)
-    network.show_current()
+    print(f"path: {communication.get_path()}")
     communication.start()
-    network.show_current()
     communication.end()
-    network.show_current()
