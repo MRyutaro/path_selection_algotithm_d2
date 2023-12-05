@@ -37,11 +37,12 @@ class CommunicationManager():
             raise Exception("通信時間は0以上である必要があります。")
         if self.arrival_interval < 0:
             raise Exception("通信の到着間隔は0以上である必要があります。")
-        # サービス時間と到着間隔は指数分布に従う. 0で初期化
+        # サービス時間と到着間隔は指数分布に従う。0で初期化
         self.avarage_service_time = average_service_time
         self.avarage_arrival_interval = average_arrival_interval
 
-        self.communication_start_schedule: dict[int, list[Communication]] = {}
+        # 一定到着率の仮定より、単位時間あたりに到着する通信の数は1つとする
+        self.communication_start_schedule: dict[int, Communication] = {}
         self.communicaton_end_schedule: dict[int, list[Communication]] = {}
 
         self.out_file = f"data/algorithm_{self.ALGORITHM}_out.csv"
@@ -99,11 +100,11 @@ class CommunicationManager():
         print(f"通信開始試行回数: {self.try_start_num}", end=", ")
         print(f"呼損率: {self.loss()}")
 
-    def __print_status(self) -> None:
+    def __print_status(self, time) -> None:
         """
         現在の通信の状況を出力する。
         """
-        print(f"通信時間: {self.service_time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}, 呼損率: {self.loss()}")
+        print(f"時間: {time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}")
         print(f"通信開始スケジュール: {self.communication_start_schedule}")
         print(f"通信終了スケジュール: {self.communicaton_end_schedule}")
 
@@ -112,48 +113,56 @@ class CommunicationManager():
         通信を実行する。
         """
         time = 0
+
+        # 最初の通信を開始スケジュールに追加
+        s_node, e_node = self.network.random_two_nodes()
+        communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
+        if self.avarage_service_time > 0:
+            communication.set_service_time_by_expovariate(self.avarage_service_time)
+        if self.avarage_arrival_interval > 0:
+            communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
+        arrival_interval = communication.get_arrival_interval()
+        if arrival_interval <= 0:
+            raise Exception("通信の到着間隔は0より大きい必要があります。")
+
+        self.communication_start_schedule[time + arrival_interval] = communication
+
         while True:
             # 現在の通信の状況を出力
-            # self.__print_status()
+            # self.__print_status(time)
 
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num < self.MAX_TRY_START_NUM:
-                # 通信の到着
-                s_node, e_node = self.network.random_two_nodes()
-                communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
-
-                # サービス時間と到着間隔を設定
-                if self.avarage_service_time > 0:
-                    communication.set_service_time_by_expovariate(self.avarage_service_time)
-                if self.avarage_arrival_interval > 0:
-                    communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
-
-                arrival_interval = communication.get_arrival_interval()
-                if arrival_interval <= 0:
-                    raise Exception("通信の到着間隔は0より大きい必要があります。")
-
-                if time + arrival_interval in self.communication_start_schedule:
-                    self.communication_start_schedule[time + arrival_interval].append(communication)
-                else:
-                    self.communication_start_schedule[time + arrival_interval] = [communication]
-
                 # 通信の開始
                 if time in self.communication_start_schedule:
-                    for communication in self.communication_start_schedule[time]:
-                        self.try_start_num += 1
-                        if communication.start():
-                            self.communication_start_num += 1
-                            service_time = communication.get_service_time()
-                            if service_time <= 0:
-                                raise Exception("通信時間は0より大きい必要があります。")
+                    communication = self.communication_start_schedule[time]
+                    self.try_start_num += 1
+                    if communication.start():
+                        self.communication_start_num += 1
+                        service_time = communication.get_service_time()
+                        if service_time <= 0:
+                            raise Exception("通信時間は0より大きい必要があります。")
 
-                            if time + service_time in self.communicaton_end_schedule:
-                                self.communicaton_end_schedule[time + service_time].append(communication)
-                            else:
-                                self.communicaton_end_schedule[time + service_time] = [communication]
+                        if time + service_time in self.communicaton_end_schedule:
+                            self.communicaton_end_schedule[time + service_time].append(communication)
+                        else:
+                            self.communicaton_end_schedule[time + service_time] = [communication]
 
-                    # 通信が始まっても始まらなくてもスケジュールから削除
+                    # 通信が始まっても始まらなくても開始スケジュールから削除
                     self.communication_start_schedule.pop(time)
+
+                    # communication_start_scheduleの管理
+                    s_node, e_node = self.network.random_two_nodes()
+                    communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
+                    if self.avarage_service_time > 0:
+                        communication.set_service_time_by_expovariate(self.avarage_service_time)
+                    if self.avarage_arrival_interval > 0:
+                        communication.set_arrival_interval_by_expovariate(self.avarage_arrival_interval)
+                    arrival_interval = communication.get_arrival_interval()
+                    if arrival_interval <= 0:
+                        raise Exception("通信の到着間隔は0より大きい必要があります。")
+                    # 次の通信の到着を開始スケジュールに追加
+                    self.communication_start_schedule[time + arrival_interval] = communication
 
             else:
                 # 終了
@@ -180,5 +189,5 @@ class CommunicationManager():
 
 
 if __name__ == "__main__":
-    cm = CommunicationManager(algorithm=1)
+    cm = CommunicationManager(algorithm=1, average_arrival_interval=1, average_service_time=1)
     cm.run()
