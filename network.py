@@ -1,6 +1,8 @@
-from collections import deque
-import numpy as np
+import copy
 import random
+from collections import deque
+
+import numpy as np
 
 
 class Network():
@@ -20,7 +22,7 @@ class Network():
             [0, 0, 0, 0, 0, 4, 3, 4, 0, 3],  # 8
             [0, 0, 0, 0, 0, 0, 0, 3, 3, 0],  # 9
         ]
-        self.current_networks = self.networks.copy()
+        self.current_networks = copy.deepcopy(self.networks)
 
     def get(self) -> list:
         return self.networks
