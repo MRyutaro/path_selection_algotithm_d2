@@ -19,7 +19,7 @@ if __name__ == "__main__":
     algorithms = [1, 2, 3, 4, 5, 6]
 
     # サービス時間。初期値は1から100までの整数
-    service_times = [i for i in range(1, 101)]
+    service_times = [i for i in range(1, 501)]
 
     for algorithm in algorithms:
         print(f"algorithm: {algorithm}")
