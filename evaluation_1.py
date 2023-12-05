@@ -5,12 +5,12 @@ import pandas as pd
 experiment = 1
 
 file_path = [
-    f'data/{experiment}/algorithm_1_out.csv',
-    f'data/{experiment}/algorithm_2_out.csv',
-    f'data/{experiment}/algorithm_3_out.csv',
-    f'data/{experiment}/algorithm_4_out.csv',
-    f'data/{experiment}/algorithm_5_out.csv',
-    f'data/{experiment}/algorithm_6_out.csv'
+    f'data/ex1/{experiment}/algorithm_1_out.csv',
+    f'data/ex1/{experiment}/algorithm_2_out.csv',
+    f'data/ex1/{experiment}/algorithm_3_out.csv',
+    f'data/ex1/{experiment}/algorithm_4_out.csv',
+    f'data/ex1/{experiment}/algorithm_5_out.csv',
+    f'data/ex1/{experiment}/algorithm_6_out.csv'
 ]
 
 algorithms = [
