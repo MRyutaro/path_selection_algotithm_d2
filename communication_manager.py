@@ -8,7 +8,7 @@ class CommunicationManager():
     """
     通信を管理するオブジェクト。
     """
-    def __init__(self, algorithm, service_time: int = 1, arrival_interval: int = 1, average_service_time: int = 0, average_arrival_interval: int = 0) -> None:
+    def __init__(self, algorithm: int, service_time: int = 1, arrival_interval: int = 1, average_service_time: int = 0, average_arrival_interval: int = 0) -> None:
         """
         コンストラクタ。
 
@@ -89,7 +89,7 @@ class CommunicationManager():
         """
         self.avarage_arrival_interval = average_arrival_interval
 
-    def __print_result(self) -> None:
+    def print_result(self) -> None:
         """
         実験結果を表示する。
         """
@@ -100,13 +100,14 @@ class CommunicationManager():
         print(f"通信開始試行回数: {self.try_start_num}", end=", ")
         print(f"呼損率: {self.loss()}")
 
-    def __print_status(self, time) -> None:
+    def print_status(self, time) -> None:
         """
         現在の通信の状況を出力する。
         """
         print(f"時間: {time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}")
         print(f"通信開始スケジュール: {self.communication_start_schedule}")
         print(f"通信終了スケジュール: {self.communicaton_end_schedule}")
+        # self.network.show_current()
 
     def run(self) -> None:
         """
@@ -129,7 +130,7 @@ class CommunicationManager():
 
         while True:
             # 現在の通信の状況を出力
-            # self.__print_status(time)
+            # self.print_status(time)
 
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num < self.MAX_TRY_START_NUM:
@@ -183,11 +184,13 @@ class CommunicationManager():
             raise Exception("networkとcurrent_networkが一致しません。")
 
         # 実験の結果を表示
-        # self.__print_result()
+        # self.print_result()
         # 通信の保存
         self.save()
 
 
 if __name__ == "__main__":
-    cm = CommunicationManager(algorithm=1, average_arrival_interval=1, average_service_time=1)
+    service_time = 20
+    cm = CommunicationManager(algorithm=1, service_time=service_time)
     cm.run()
+    cm.print_result()
