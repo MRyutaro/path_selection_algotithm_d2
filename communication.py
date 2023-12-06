@@ -7,7 +7,7 @@ class Communication():
     """
     1回の通信を管理するオブジェクト。
     """
-    def __init__(self, network: Network, s_node: int, e_node: int, algorithm: int, service_time: int = 1, arrival_interval: int = 1) -> None:
+    def __init__(self, network: Network, s_node: int, e_node: int, service_time: int = 1, arrival_interval: int = 1) -> None:
         """
         コンストラクタ。
 
@@ -15,18 +15,13 @@ class Communication():
         - network: ネットワーク
         - s_node: 開始ノード
         - e_node: 終了ノード
-        - algorithm: 経路の決定方法
-            - 1: 最小ホップ経路を用いた固定経路
-            - 2: 最大路を用いた固定経路
-            - 3: 最小ホップ経路を用いた要求時経路
-            - 4: 最大路を用いた要求時経路
-            - 5: 最短最大路を用いた固定経路
-            - 6: 最短最大路を用いた要求時経路
         - service_time: 通信時間（初期値は1）
         - arrival_interval: 通信の到着間隔（初期値は1）
         """
+        self.s_node = s_node
+        self.e_node = e_node
         self.network = network
-        self.path = self.decide_path(s_node, e_node, algorithm)
+        self.path = []
         self.service_time = service_time
         self.arrival_interval = arrival_interval
         self.is_communicating = False
@@ -70,13 +65,11 @@ class Communication():
         """
         return self.path
 
-    def decide_path(self, s_node: int, e_node: int, algorithm: int) -> list:
+    def set_path_by(self, algorithm: int) -> list:
         """
-        経路を決定する。
+        経路を設定する。
 
         引数
-        - s_node: 開始ノード
-        - e_node: 終了ノード
         - algorithm: 経路の決定方法
             - 1: 最小ホップ経路を用いた固定経路
             - 2: 最大路を用いた固定経路
@@ -86,17 +79,17 @@ class Communication():
             - 6: 最短最大路を用いた要求時経路
         """
         if algorithm == 1:
-            return self.network.shortest_path_between(s_node, e_node, self.network.get())
+            self.path = self.network.shortest_path_between(self.s_node, self.e_node, self.network.get())
         elif algorithm == 2:
-            return self.network.widest_path_between(s_node, e_node, self.network.get())
+            self.path = self.network.widest_path_between(self.s_node, self.e_node, self.network.get())
         elif algorithm == 3:
-            return self.network.shortest_path_between(s_node, e_node, self.network.get_current())
+            self.path = self.network.shortest_path_between(self.s_node, self.e_node, self.network.get_current())
         elif algorithm == 4:
-            return self.network.widest_path_between(s_node, e_node, self.network.get_current())
+            self.path = self.network.widest_path_between(self.s_node, self.e_node, self.network.get_current())
         elif algorithm == 5:
-            return self.network.shortest_widest_path_between(s_node, e_node, self.network.get())
+            self.path = self.network.shortest_widest_path_between(self.s_node, self.e_node, self.network.get())
         elif algorithm == 6:
-            return self.network.shortest_widest_path_between(s_node, e_node, self.network.get_current())
+            self.path = self.network.shortest_widest_path_between(self.s_node, self.e_node, self.network.get_current())
         else:
             raise Exception("algorithmの値が不正です。")
 
@@ -127,7 +120,8 @@ class Communication():
 if __name__ == "__main__":
     network = Network()
     s_node, e_node = network.random_two_nodes()
-    communication = Communication(network, s_node, e_node, 3)
+    communication = Communication(network, s_node, e_node)
+    communication.set_path_by(1)
     print(f"path: {communication.get_path()}")
     communication.start()
     communication.end()

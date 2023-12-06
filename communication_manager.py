@@ -24,7 +24,7 @@ class CommunicationManager():
         - arrival_interval: 通信の到着間隔（初期値は1）
         """
         self.network = Network()
-        self.ALGORITHM = algorithm
+        self.algorithm = algorithm
         self.communication_start_num = 0
         self.communication_end_num = 0
         self.try_start_num = 0
@@ -45,7 +45,7 @@ class CommunicationManager():
         self.communication_start_schedule: dict[int, Communication] = {}
         self.communicaton_end_schedule: dict[int, list[Communication]] = {}
 
-        self.out_file = f"data/algorithm_{self.ALGORITHM}_out.csv"
+        self.out_file = f"data/algorithm_{self.algorithm}_out.csv"
         self.setup()
 
     def setup(self) -> None:
@@ -99,7 +99,7 @@ class CommunicationManager():
         """
         実験結果を表示する。
         """
-        print(f"アルゴリズム: {self.ALGORITHM}", end=", ")
+        print(f"アルゴリズム: {self.algorithm}", end=", ")
         if self.avarage_service_time > 0:
             print(f"サービス時間の平均: {self.avarage_service_time}", end=", ")
         else:
@@ -129,7 +129,7 @@ class CommunicationManager():
 
         # 最初の通信を開始スケジュールに追加
         s_node, e_node = self.network.random_two_nodes()
-        communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
+        communication = Communication(self.network, s_node, e_node, self.service_time, self.arrival_interval)
         if self.avarage_service_time > 0:
             communication.set_service_time_by_geometric_distribution(self.avarage_service_time)
         if self.avarage_arrival_interval > 0:
@@ -142,7 +142,7 @@ class CommunicationManager():
 
         while True:
             # 現在の通信の状況を出力
-            self.print_status(time)
+            # self.print_status(time)
 
             # 通信の終了
             if time in self.communicaton_end_schedule:
@@ -156,6 +156,8 @@ class CommunicationManager():
                 # 通信の開始
                 if time in self.communication_start_schedule:
                     communication = self.communication_start_schedule[time]
+                    communication.set_path_by(self.algorithm)
+
                     self.try_start_num += 1
                     if communication.start():
                         self.communication_start_num += 1
@@ -173,7 +175,7 @@ class CommunicationManager():
 
                     # communication_start_scheduleの管理
                     s_node, e_node = self.network.random_two_nodes()
-                    communication = Communication(self.network, s_node, e_node, self.ALGORITHM, self.service_time, self.arrival_interval)
+                    communication = Communication(self.network, s_node, e_node, self.service_time, self.arrival_interval)
                     if self.avarage_service_time > 0:
                         communication.set_service_time_by_geometric_distribution(self.avarage_service_time)
                     if self.avarage_arrival_interval > 0:
@@ -202,7 +204,7 @@ class CommunicationManager():
 
 
 if __name__ == "__main__":
-    algorithm = 1
+    algorithm = 6
     service_time = 100
     average_service_time = 0
     average_arrival_interval = 0
