@@ -31,7 +31,8 @@ for i, path in enumerate(file_path):
     # lossの平均値を計算
     average_loss = df.groupby('service_time')['loss'].mean().reset_index()
     # グラフの描画
-    plt.plot(average_loss['service_time'], average_loss['loss'], label=algorithms[i])
+    plt.plot(average_loss['service_time'],
+             average_loss['loss'], label=algorithms[i])
 
 plt.legend()
 plt.show()

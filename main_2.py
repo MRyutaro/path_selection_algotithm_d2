@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # algorithms = [3, 4]
     # algorithms = [5, 6]
 
-    # 平均サービス時間。初期値は[i for i in range(1, 101)]
+    # 平均サービス時間。初期値は[i for i in range(1, 501)]
     average_service_times = [i for i in range(1, 101)]
 
     # 平均到着間隔。初期値は[i for i in range(1, 11)]
