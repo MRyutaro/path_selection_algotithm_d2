@@ -116,7 +116,8 @@ class CommunicationManager():
         """
         現在の通信の状況を出力する。
         """
-        print(f"時間: {time}, 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}", end=", ")
+        print(f"{time} -> 通信開始回数: {self.communication_start_num}, 通信開始試行回数: {self.try_start_num}", end=", ")
+        print(f"現在のネットワークの総容量: {self.network.get_sum_current_networks()}", end=", ")
         print(f"通信開始スケジュールの長さ: {len(self.communication_start_schedule)}", end=", ")
         print(f"通信終了スケジュールの長さ: {len(self.communicaton_end_schedule)}")
 
@@ -141,7 +142,14 @@ class CommunicationManager():
 
         while True:
             # 現在の通信の状況を出力
-            # self.print_status(time)
+            self.print_status(time)
+
+            # 通信の終了
+            if time in self.communicaton_end_schedule:
+                for communication in self.communicaton_end_schedule[time]:
+                    self.communication_end_num += 1
+                    communication.end()
+                self.communicaton_end_schedule.pop(time)
 
             # 通信試行回数がMAX_TRY_START_NUMを超えた以降は通信を開始しない
             if self.try_start_num < self.MAX_TRY_START_NUM:
@@ -181,13 +189,6 @@ class CommunicationManager():
                 if len(self.communicaton_end_schedule) == 0:
                     break
 
-            # 通信の終了
-            if time in self.communicaton_end_schedule:
-                for communication in self.communicaton_end_schedule[time]:
-                    self.communication_end_num += 1
-                    communication.end()
-                self.communicaton_end_schedule.pop(time)
-
             time += 1
 
         # networkとcurrent_networkが一致していなければエラー
@@ -201,10 +202,10 @@ class CommunicationManager():
 
 
 if __name__ == "__main__":
-    algorithm = 4
-    service_time = 0
-    average_service_time = 2
-    average_arrival_interval = 1
+    algorithm = 1
+    service_time = 100
+    average_service_time = 0
+    average_arrival_interval = 0
     cm = CommunicationManager(
         algorithm=algorithm,
         service_time=service_time,
