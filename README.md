@@ -16,7 +16,8 @@ C:.
 │  .gitignore ---------------> git管理対象外のファイルやフォルダを指定するファイル
 │  communication.py ---------> Communicationクラスを定義するファイル
 │  communication_manager.py -> CommunicationManagerクラスを定義するファイル
-│  evaluation.py ------------> 評価用のグラフを描画するときに実行するファイル
+│  evaluation_1.py -----------> 実験1の評価用のグラフを描画するときに実行するファイル
+│  evaluation_2.py -----------> 実験2の評価用のグラフを描画するときに実行するファイル
 │  main_1.py ----------------> 実験1を行うときに実行するファイル
 │  main_2.py ----------------> 実験2を行うときに実行するファイル
 │  network.py ---------------> Networkクラスを定義するファイル
