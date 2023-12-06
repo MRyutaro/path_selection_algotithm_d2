@@ -40,6 +40,9 @@ class Network():
         for i in range(len(self.current_networks)):
             print(self.current_networks[i])
 
+    def get_sum_current_networks(self) -> int:
+        return sum([sum(row) for row in self.current_networks]) / 2
+
     def random_two_nodes(self) -> tuple[int, int]:
         """
         ランダムなノードを2つ返す.
@@ -314,7 +317,7 @@ if __name__ == "__main__":
 
     now = datetime.datetime.now()
 
-    for _ in range(10000):
+    for i in range(100):
         # 開始ノードと終了ノードを取得
         start_node, end_node = network.random_two_nodes()
 
@@ -336,7 +339,7 @@ if __name__ == "__main__":
         # # 最大路を求める
         widest_path = network.widest_path_between(start_node, end_node, network.get())
         # # 結果を表示
-        print(f"Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
+        print(f"{i}: Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
         # ==========
 
     print(f"time: {datetime.datetime.now() - now}")
