@@ -79,14 +79,10 @@ class Network():
         if len(path) == 0:
             return False
 
-        # path上のすべてのリンクの容量が1以上あるか確認したあと、容量を1減らす
+        # path上のすべてのリンクの容量が1以上あるか確認
         for i in range(len(path) - 1):
-            if self.current_networks[path[i]][path[i + 1]] < 1:
+            if not self.is_capable_between(path[i], path[i + 1]):
                 return False
-
-        # networkの総和を計算
-        # sum_network = sum([sum(row) for row in self.current_networks])
-        # print(f"sum_network: {sum_network/2}")
 
         # 容量を1減らす
         for i in range(len(path) - 1):
@@ -94,7 +90,6 @@ class Network():
             self.current_networks[path[i + 1]][path[i]] -= 1
             if self.current_networks[path[i]][path[i + 1]] < 0:
                 raise Exception("current_networksの容量が0以下です。")
-
 
         return True
 
@@ -320,26 +315,29 @@ if __name__ == "__main__":
     for i in range(100):
         # 開始ノードと終了ノードを取得
         start_node, end_node = network.random_two_nodes()
+        print(f"start_node: {start_node}, end_node: {end_node}")
 
         # ==========
         # 深さ優先探索で経路を求める
-        # path = network.path_between(start_node, end_node, network.get())
+        path = network.path_between(start_node, end_node, network.get())
         # 結果を表示
-        # print(f"Path from Node {start_node} to Node {end_node}: {path}")
+        print(f"{i} -> {path}: 経路")
         # ==========
 
         # ==========
         # # 幅優先探索で最小ホップ経路を求める
-        # shortest_path = network.shortest_path_between(start_node, end_node, network.get())
+        shortest_path = network.shortest_path_between(start_node, end_node, network.get())
         # # 結果を表示
-        # print(f"Shortest Path from Node {start_node} to Node {end_node}: {shortest_path}")
+        print(f"{i} -> {shortest_path}: 最小ホップ経路")
         # ==========
 
         # ==========
         # # 最大路を求める
         widest_path = network.widest_path_between(start_node, end_node, network.get())
         # # 結果を表示
-        print(f"{i}: Widest Path from Node {start_node} to Node {end_node}: {widest_path}")
+        print(f"{i} -> {widest_path}: 最大路")
         # ==========
+
+        print()
 
     print(f"time: {datetime.datetime.now() - now}")
