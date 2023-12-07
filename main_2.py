@@ -17,11 +17,8 @@ if __name__ == "__main__":
     # 5: static shortest widest path
     # 6: dynamic shortest widest path
     algorithms = [1, 2, 3, 4, 5, 6]
-    # algorithms = [1, 2]
-    # algorithms = [3, 4]
-    # algorithms = [5, 6]
 
-    # 平均サービス時間。初期値は[i for i in range(1, 501)]
+    # 平均サービス時間。初期値は[i for i in range(1, 101)]
     average_service_times = [i for i in range(1, 101)]
 
     # 平均到着間隔。初期値は[i for i in range(1, 11)]

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-experiment = 4
+experiment = 1
 
 file_path = [
     f'data/ex2/{experiment}/algorithm_1_out.csv',
@@ -10,7 +10,7 @@ file_path = [
     f'data/ex2/{experiment}/algorithm_3_out.csv',
     f'data/ex2/{experiment}/algorithm_4_out.csv',
     f'data/ex2/{experiment}/algorithm_5_out.csv',
-    # f'data/ex2/{experiment}/algorithm_6_out.csv'
+    f'data/ex2/{experiment}/algorithm_6_out.csv'
 ]
 
 algorithms = [
@@ -19,7 +19,7 @@ algorithms = [
     '3: dynamic shortest path',
     '4: dynamic widest path',
     '5: static shortest widest path',
-    # '6: dynamic shortest widest path'
+    '6: dynamic shortest widest path'
 ]
 
 plt.xlabel('Average Service Time / Average Arrival Interval')
