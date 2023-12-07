@@ -43,7 +43,12 @@ python main_1.py
 python main_2.py
 ```
 
-### 3. 評価用グラフの描画
+### 3-1. 実験1に対する評価用グラフの描画
 ```
-python evaluation.py
+python evaluation_1.py
+```
+
+### 3-2. 実験2に対する評価用グラフの描画
+```
+python evaluation_2.py
 ```
